@@ -1,0 +1,2672 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>DEV AL AMIN | Admin Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Outfit', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        navy: { 950: '#050b1a', 900: '#091432', 800: '#0b2a6f' },
+                        royal: '#1e63f0',
+                        cyanNeon: '#00e5ff',
+                        skyGlow: '#4fa3ff',
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --bg-void: #050b1a;
+            --royal-navy: #0b2a6f;
+            --electric-blue: #1e63f0;
+            --neon-cyan: #00e5ff;
+            --sky-glow: #4fa3ff;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050b1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e63f0;
+            border-radius: 9999px;
+        }
+
+        .static-panel {
+            background: linear-gradient(160deg, rgba(11, 42, 111, 0.42) 0%, rgba(5, 11, 26, 0.97) 100%);
+            border: 1px solid rgba(79, 163, 255, 0.24);
+            box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.85);
+        }
+
+        .btn-pill-cyan {
+            background: linear-gradient(135deg, #00e5ff 0%, #1e63f0 100%);
+            color: #050b1a;
+            font-weight: 800;
+        }
+        .btn-pill-cyan:hover {
+            filter: brightness(1.06);
+        }
+
+        .btn-pill-royal {
+            background: linear-gradient(135deg, #1e63f0 0%, #0b2a6f 100%);
+            border: 1px solid rgba(0, 229, 255, 0.35);
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .btn-pill-royal:hover {
+            filter: brightness(1.08);
+        }
+
+        .glass-bar {
+            background: rgba(5, 11, 26, 0.94);
+            border: 1px solid rgba(79, 163, 255, 0.24);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.72);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-[#00e5ff] selection:text-[#050b1a]">
+
+    <!-- Toast Notifications -->
+    <div id="admin-toast-box" class="fixed bottom-4 left-1/2 -translate-x-1/2 sm:left-auto sm:right-5 sm:translate-x-0 z-[130] flex flex-col items-center sm:items-end gap-2 pointer-events-none w-[92vw] sm:w-auto"></div>
+
+    <!-- =====================================================================
+         TOP HEADER BAR
+    ====================================================================== -->
+    <header class="sticky top-0 z-40 px-3 sm:px-6 pt-2.5">
+        <nav class="max-w-6xl mx-auto glass-bar rounded-2xl px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#00e5ff] via-[#1e63f0] to-[#0b2a6f] p-[1.5px] shrink-0">
+                    <div class="w-full h-full bg-[#050b1a] rounded-[10px] flex items-center justify-center font-mono font-black text-xs sm:text-sm text-[#00e5ff]">
+                        DA
+                    </div>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="font-display font-black text-sm sm:text-lg text-white truncate">DEV AL AMIN • ADMIN</h1>
+                        <span id="fb-status-badge" class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-400/35">
+                            LOCAL / OFFLINE
+                        </span>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] font-mono text-slate-400 truncate">
+                        RTDB: <span class="text-[#00e5ff]">devAlAmin/catalog</span> • <span class="text-[#4fa3ff]">settings</span> • <span class="text-emerald-300">orders</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <a href="index.html" class="btn-pill-royal px-3 py-2 rounded-xl text-xs flex items-center gap-1">
+                    <span>← Public Site</span>
+                </a>
+                <button id="btn-header-lock" type="button" onclick="lockAdminSession()" class="hidden px-3 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-xs font-bold text-rose-300 cursor-pointer">
+                    Lock
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- =====================================================================
+         MAIN WORKSPACE
+    ====================================================================== -->
+    <main class="relative z-10 max-w-6xl mx-auto px-3 sm:px-6 pt-4 pb-20 space-y-5">
+
+        <!-- -----------------------------------------------------------------
+             1. STRICT PASSWORD-ONLY ADMIN LOGIN GATE
+        ------------------------------------------------------------------ -->
+        <section id="admin-login-card" class="static-panel rounded-3xl p-5 sm:p-7 max-w-2xl mx-auto space-y-4">
+            <div class="border-b border-slate-800 pb-3.5">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff]">Protected Access Gate</span>
+                <h2 class="text-xl sm:text-2xl font-black text-white mt-0.5">DEV AL AMIN Admin Login</h2>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Admin password is required to access this panel. Enter your saved admin password to unlock.
+            </p>
+
+            <form id="admin-login-form" onsubmit="event.preventDefault(); loginAdminPanel();" class="flex flex-col sm:flex-row gap-2">
+                <div class="relative flex-1 flex items-center">
+                    <input id="admin-login-pass" type="password" autocomplete="current-password" required placeholder="Enter admin password..."
+                           class="w-full px-3.5 py-2.5 pr-16 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-xs sm:text-sm font-mono text-white">
+                    <button type="button" onclick="toggleLoginPasswordVisibility()" class="absolute right-2.5 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-mono text-cyan-300 cursor-pointer">
+                        Show
+                    </button>
+                </div>
+                <button id="btn-unlock-admin" type="submit" onclick="loginAdminPanel()" class="btn-pill-cyan px-5 py-2.5 rounded-xl text-xs sm:text-sm cursor-pointer">
+                    Unlock with Password
+                </button>
+            </form>
+        </section>
+
+        <!-- -----------------------------------------------------------------
+             2. FULL ADMIN DASHBOARD (HIDDEN UNTIL PASSWORD VERIFIED)
+        ------------------------------------------------------------------ -->
+        <div id="admin-dashboard-wrap" class="hidden space-y-6">
+
+            <!-- Firebase Realtime Database Config Section -->
+            <section class="static-panel rounded-3xl p-4 sm:p-6 space-y-3.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff]">Cloud Sync</span>
+                        <h2 class="text-base sm:text-xl font-black text-white">Firebase Realtime Database Config</h2>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="testFirebaseConnection()" class="btn-pill-royal px-3 py-1.5 rounded-xl text-xs cursor-pointer">
+                            Test Connection
+                        </button>
+                        <button type="button" onclick="toggleRtdbRulesBox()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-mono text-cyan-300 cursor-pointer">
+                            RTDB Rules
+                        </button>
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Fill individual Firebase fields below or paste your full <code class="text-[#00e5ff]">firebaseConfig</code> object / JSON / <code class="text-[#00e5ff]">databaseURL</code>, then click <strong>Connect &amp; Save Config</strong>.
+                </p>
+
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label for="fb-paste-config" class="text-[11px] font-mono text-[#00e5ff]">Quick Paste Config / JSON / Database URL</label>
+                        <button type="button" onclick="applyPastedFirebaseConfig()" class="text-[11px] font-mono text-emerald-300 hover:underline cursor-pointer">
+                            Parse into Fields ↓
+                        </button>
+                    </div>
+                    <textarea id="fb-paste-config" rows="3" placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"https://your-project-default-rtdb.firebaseio.com","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}'
+                              class="w-full rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none p-2.5 text-xs font-mono text-cyan-200"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
+                    <div class="sm:col-span-2 lg:col-span-2">
+                        <label for="fb-database-url" class="block text-[11px] font-mono text-slate-400 mb-1">databaseURL *</label>
+                        <input id="fb-database-url" type="text" placeholder="https://your-project-default-rtdb.firebaseio.com"
+                               class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                    </div>
+                    <div>
+                        <label for="fb-api-key" class="block text-[11px] font-mono text-slate-400 mb-1">apiKey</label>
+                        <input id="fb-api-key" type="text" placeholder="AIzaSy..."
+                               class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                    </div>
+                    <div>
+                        <label for="fb-project-id" class="block text-[11px] font-mono text-slate-400 mb-1">projectId</label>
+                        <input id="fb-project-id" type="text" placeholder="dev-al-amin"
+                               class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                    </div>
+                    <div>
+                        <label for="fb-app-id" class="block text-[11px] font-mono text-slate-400 mb-1">appId</label>
+                        <input id="fb-app-id" type="text" placeholder="1:123456789:web:abcdef"
+                               class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                    </div>
+                    <div>
+                        <label for="fb-auth-domain" class="block text-[11px] font-mono text-slate-400 mb-1">authDomain</label>
+                        <input id="fb-auth-domain" type="text" placeholder="your-app.firebaseapp.com"
+                               class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                    </div>
+                    <div>
+                        <label for="fb-storage-bucket" class="block text-[11px] font-mono text-slate-400 mb-1">storageBucket</label>
+                        <input id="fb-storage-bucket" type="text" placeholder="your-app.appspot.com"
+                               class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                    </div>
+                    <div>
+                        <label for="fb-sender-id" class="block text-[11px] font-mono text-slate-400 mb-1">messagingSenderId</label>
+                        <input id="fb-sender-id" type="text" placeholder="123456789"
+                               class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                    <button type="button" onclick="connectAndSaveFirebase()" class="btn-pill-cyan px-4 py-2.5 rounded-xl text-xs sm:text-sm cursor-pointer">
+                        Connect &amp; Save Config
+                    </button>
+                    <button type="button" onclick="clearFirebaseConfig()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 cursor-pointer">
+                        Clear Config
+                    </button>
+                </div>
+
+                <div id="rtdb-rules-panel" class="hidden rounded-2xl bg-[#050b1a] border border-[#4fa3ff]/25 p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-mono text-[#00e5ff]">Recommended Realtime Database Rules</span>
+                        <button type="button" onclick="copyRtdbRules()" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-cyan-300 cursor-pointer">Copy Rules</button>
+                    </div>
+                    <pre id="rtdb-rules-code" class="text-[11px] font-mono text-emerald-300 overflow-x-auto">{
+  "rules": {
+    "devAlAmin": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}</pre>
+                </div>
+            </section>
+
+            <!-- Top Action Bar: Seed / JSON Export / JSON Import / Reset -->
+            <section class="static-panel rounded-3xl p-4 sm:p-5 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff]">Data Toolkit</span>
+                        <h2 class="text-base sm:text-lg font-black text-white">Seed, Export, Import &amp; Reset</h2>
+                        <p class="text-xs text-slate-400">
+                            Categories: <strong id="summary-cat-count" class="text-[#00e5ff]">0</strong> •
+                            Items: <strong id="summary-item-count" class="text-emerald-300">0</strong> •
+                            Orders: <strong id="summary-order-count" class="text-sky-300">0</strong>
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" onclick="seedStarterData()" class="btn-pill-cyan px-3.5 py-2 rounded-xl text-xs cursor-pointer">
+                            Seed Starter Data
+                        </button>
+                        <button type="button" onclick="exportFullJson()" class="btn-pill-royal px-3.5 py-2 rounded-xl text-xs cursor-pointer">
+                            Export JSON
+                        </button>
+                        <button type="button" onclick="openImportJsonModal()" class="btn-pill-royal px-3.5 py-2 rounded-xl text-xs cursor-pointer">
+                            Import JSON
+                        </button>
+                        <button type="button" onclick="resetAllAdminData()" class="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-xs font-bold text-rose-300 cursor-pointer">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Navigation Tabs -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button id="tab-btn-catalog" type="button" onclick="switchAdminTab('catalog')"
+                        class="btn-pill-cyan py-2.5 px-3 rounded-2xl text-xs sm:text-sm font-display font-extrabold cursor-pointer">
+                    Categories &amp; Items
+                </button>
+                <button id="tab-btn-settings" type="button" onclick="switchAdminTab('settings')"
+                        class="btn-pill-royal py-2.5 px-3 rounded-2xl text-xs sm:text-sm font-display font-bold cursor-pointer">
+                    Live Site Settings
+                </button>
+                <button id="tab-btn-orders" type="button" onclick="switchAdminTab('orders')"
+                        class="btn-pill-royal py-2.5 px-3 rounded-2xl text-xs sm:text-sm font-display font-bold cursor-pointer">
+                    Orders (<span id="tab-orders-badge">0</span>)
+                </button>
+                <button id="tab-btn-json" type="button" onclick="switchAdminTab('json')"
+                        class="btn-pill-royal py-2.5 px-3 rounded-2xl text-xs sm:text-sm font-display font-bold cursor-pointer">
+                    JSON Inspector
+                </button>
+            </div>
+
+            <!-- =============================================================
+                 TAB A: CATEGORIES & VERSION ITEMS MANAGER
+            ============================================================== -->
+            <div id="admin-tab-catalog" class="space-y-6">
+
+                <section class="static-panel rounded-3xl p-4 sm:p-6 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff]">Catalog Categories</span>
+                            <h3 class="text-lg sm:text-xl font-black text-white">Manage &amp; Reorder Categories</h3>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="moveSelectedCategory(-1)" class="px-3 py-1.5 rounded-xl bg-[#091432] hover:bg-[#1e63f0]/40 border border-[#4fa3ff]/30 text-xs font-mono font-bold text-[#00e5ff] cursor-pointer">
+                                ↑ Move Up
+                            </button>
+                            <button type="button" onclick="moveSelectedCategory(1)" class="px-3 py-1.5 rounded-xl bg-[#091432] hover:bg-[#1e63f0]/40 border border-[#4fa3ff]/30 text-xs font-mono font-bold text-[#00e5ff] cursor-pointer">
+                                ↓ Move Down
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="category-pill-list" class="flex flex-wrap gap-2"></div>
+
+                    <div class="rounded-2xl bg-[#050b1a]/85 border border-[#4fa3ff]/25 p-4 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <h4 id="cat-form-heading" class="text-sm font-display font-bold text-[#00e5ff]">Edit Selected Category</h4>
+                            <button type="button" onclick="prepareNewCategoryForm()" class="px-3 py-1 rounded-lg bg-[#00e5ff]/15 hover:bg-[#00e5ff]/25 border border-[#00e5ff]/40 text-[11px] font-mono font-bold text-[#00e5ff] cursor-pointer">
+                                + Add New Category
+                            </button>
+                        </div>
+
+                        <input type="hidden" id="cat-mode" value="edit">
+                        <input type="hidden" id="cat-original-key" value="free-website">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                            <div>
+                                <label for="cat-key-input" class="block text-[11px] font-mono text-slate-400 mb-1">Category ID / Key *</label>
+                                <input id="cat-key-input" type="text" placeholder="free-website, bot-making, api-keys"
+                                       class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div>
+                                <label for="cat-title-input" class="block text-[11px] font-mono text-slate-400 mb-1">Category Title *</label>
+                                <input id="cat-title-input" type="text" placeholder="e.g. Free Website"
+                                       class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label for="cat-badge-input" class="block text-[11px] font-mono text-slate-400 mb-1">Badge Text</label>
+                                <input id="cat-badge-input" type="text" placeholder="e.g. 100% FREE"
+                                       class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-emerald-300">
+                            </div>
+                            <div>
+                                <label for="cat-tag-input" class="block text-[11px] font-mono text-slate-400 mb-1">Tag Label</label>
+                                <input id="cat-tag-input" type="text" placeholder="e.g. HOT / NEW / TOOL"
+                                       class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-[#00e5ff]">
+                            </div>
+                            <div>
+                                <label for="cat-icon-input" class="block text-[11px] font-mono text-slate-400 mb-1">Icon (Emoji / Short Code)</label>
+                                <input id="cat-icon-input" type="text" placeholder="e.g. 🌐, 📱, 🤖, 📄"
+                                       class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label for="cat-order-input" class="block text-[11px] font-mono text-slate-400 mb-1">Display Order</label>
+                                <input id="cat-order-input" type="number" value="1" min="0"
+                                       class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label for="cat-gradient-input" class="block text-[11px] font-mono text-slate-400 mb-1">Gradient Preset / CSS</label>
+                                <input id="cat-gradient-input" type="text" placeholder="from-[#00e5ff]/25 via-[#1e63f0]/35 to-[#0b2a6f]"
+                                       class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-sky-200">
+                            </div>
+                            <div class="sm:col-span-2 lg:col-span-4">
+                                <label for="cat-summary-input" class="block text-[11px] font-mono text-slate-400 mb-1">Category Summary</label>
+                                <input id="cat-summary-input" type="text" placeholder="Short description displayed on index.html card..."
+                                       class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white">
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                            <button type="button" onclick="saveCategoryDetails()" class="btn-pill-cyan px-4 py-2 rounded-xl text-xs cursor-pointer">
+                                Save Category
+                            </button>
+                            <button type="button" onclick="deleteSelectedCategory()" class="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-xs font-bold text-rose-300 cursor-pointer">
+                                Delete Category
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Add / Edit Version Item Form (Matched with Updated User Panel Fields) -->
+                <section class="static-panel rounded-3xl p-4 sm:p-6 space-y-4">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff]">Catalog Items</span>
+                            <h3 id="item-form-heading" class="text-lg sm:text-xl font-black text-white">Add New Item to Category</h3>
+                        </div>
+                        <button id="btn-cancel-item-edit" type="button" onclick="resetItemForm()" class="hidden px-3 py-1.5 rounded-xl bg-slate-800 text-xs font-mono text-rose-300 cursor-pointer">
+                            Cancel Edit
+                        </button>
+                    </div>
+
+                    <input type="hidden" id="edit-item-id" value="">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                        <div>
+                            <label for="item-title-input" class="block text-[11px] font-mono text-slate-400 mb-1">Item Title *</label>
+                            <input id="item-title-input" type="text" placeholder="e.g. Free Fire TopUp Website Source"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white">
+                        </div>
+                        <div>
+                            <label for="item-version-input" class="block text-[11px] font-mono text-slate-400 mb-1">Version Label (ver)</label>
+                            <input id="item-version-input" type="text" placeholder="e.g. Version 1.0 or BOT V1.0"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-[#00e5ff]">
+                        </div>
+                        <div>
+                            <label for="item-tag-input" class="block text-[11px] font-mono text-slate-400 mb-1">Badge Tag (tag)</label>
+                            <input id="item-tag-input" type="text" placeholder="e.g. HOT, KEY, FREE, LATEST"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-emerald-300">
+                        </div>
+
+                        <div>
+                            <label for="item-subtitle-input" class="block text-[11px] font-mono text-slate-400 mb-1">Subtitle / Tagline</label>
+                            <input id="item-subtitle-input" type="text" placeholder="e.g. Mobile Ready + Firebase"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white">
+                        </div>
+                        <div>
+                            <label for="item-chips-input" class="block text-[11px] font-mono text-slate-400 mb-1">Feature / Platform Chips</label>
+                            <input id="item-chips-input" type="text" placeholder="Netlify, Render, GitHub, Catbox"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-sky-200">
+                        </div>
+                        <div>
+                            <label for="item-lockpass-input" class="block text-[11px] font-mono text-slate-400 mb-1">Unlock Password (lockPass)</label>
+                            <input id="item-lockpass-input" type="text" placeholder="e.g. ALAMIN"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-amber-300">
+                        </div>
+
+                        <div class="sm:col-span-2 lg:col-span-3">
+                            <label for="item-desc-input" class="block text-[11px] font-mono text-slate-400 mb-1">Description (desc)</label>
+                            <textarea id="item-desc-input" rows="2" placeholder="Detailed release notes, download subtitle, or tool instructions..."
+                                      class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white"></textarea>
+                        </div>
+
+                        <!-- Access & Special Mode Toggles -->
+                        <div class="rounded-xl bg-[#050b1a]/90 border border-slate-800 p-3 flex flex-col justify-center gap-2">
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input id="item-locked-input" type="checkbox" class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="font-bold text-amber-300">Locked Resource (Requires Key)</span>
+                            </label>
+                            <input id="item-keyhint-input" type="text" placeholder="Password / Key Hint (e.g. Key: ALAMIN)"
+                                   class="w-full px-2.5 py-1.5 rounded-lg bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-amber-200">
+                        </div>
+
+                        <div class="rounded-xl bg-[#050b1a]/90 border border-slate-800 p-3 flex flex-col justify-center gap-2">
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input id="item-visible-input" type="checkbox" checked class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="font-bold text-emerald-300">Visible on User Panel</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input id="item-featured-input" type="checkbox" class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="font-bold text-[#00e5ff]">Featured / Highlighted Item</span>
+                            </label>
+                        </div>
+
+                        <div class="rounded-xl bg-[#050b1a]/90 border border-slate-800 p-3 flex flex-col justify-center gap-1.5">
+                            <span class="text-[10px] font-mono uppercase text-slate-400">User Detail Layout Mode</span>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input id="item-isbot-input" type="checkbox" class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="text-cyan-200 font-semibold">Bot Layout (Render / BotFather / Uptime)</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input id="item-isapi-input" type="checkbox" class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="text-sky-200 font-semibold">API Key Copy Layout</span>
+                            </label>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input id="item-isreview-input" type="checkbox" class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="text-amber-200 font-semibold">Reviews Popover Layout</span>
+                            </label>
+                        </div>
+
+                        <!-- URLs & Thumbnail -->
+                        <div>
+                            <label for="item-download-input" class="block text-[11px] font-mono text-slate-400 mb-1">Download URL (or OPEN_TOOLS / OPEN_CODE_TO_FILE)</label>
+                            <input id="item-download-input" type="text" placeholder="https://files.catbox.moe/..."
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-emerald-300">
+                        </div>
+                        <div>
+                            <label for="item-video-input" class="block text-[11px] font-mono text-slate-400 mb-1">Video Tutorial URL</label>
+                            <input id="item-video-input" type="text" placeholder="https://www.tiktok.com/@alamin_sultanpur"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-sky-300">
+                        </div>
+                        <div>
+                            <label for="item-thumb-input" class="block text-[11px] font-mono text-slate-400 mb-1">Tutorial Thumbnail Image URL / Data URL</label>
+                            <div class="flex gap-1.5">
+                                <input id="item-thumb-input" type="text" placeholder="https://.../thumb.jpg"
+                                       class="flex-1 min-w-0 px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-cyan-200">
+                                <label for="item-thumb-file-input" class="px-2.5 py-2 rounded-xl bg-[#091432] hover:bg-[#1e63f0]/40 border border-[#4fa3ff]/30 text-[11px] font-mono text-[#00e5ff] cursor-pointer shrink-0">
+                                    Img
+                                </label>
+                                <input id="item-thumb-file-input" type="file" accept="image/*" onchange="handleItemThumbnailUpload(event)" class="hidden">
+                            </div>
+                        </div>
+
+                        <!-- Bot / API / Review Specific Fields -->
+                        <div>
+                            <label for="item-buildcmd-input" class="block text-[11px] font-mono text-slate-400 mb-1">Render Build Command</label>
+                            <input id="item-buildcmd-input" type="text" placeholder="npm install"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-cyan-200">
+                        </div>
+                        <div>
+                            <label for="item-startcmd-input" class="block text-[11px] font-mono text-slate-400 mb-1">Render Start Command</label>
+                            <input id="item-startcmd-input" type="text" placeholder="node index.js"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-cyan-200">
+                        </div>
+                        <div>
+                            <label for="item-ffx-input" class="block text-[11px] font-mono text-slate-400 mb-1">FFX / Server URL (Reviews)</label>
+                            <input id="item-ffx-input" type="text" placeholder="https://render.com/"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-sky-300">
+                        </div>
+
+                        <div>
+                            <label for="item-uidapi-input" class="block text-[11px] font-mono text-slate-400 mb-1">UID Checker API Endpoint</label>
+                            <input id="item-uidapi-input" type="text" placeholder="https://api.dev-al-amin.local/v1/ff-uid?uid={UID}"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-cyan-200">
+                        </div>
+                        <div>
+                            <label for="item-weatherapi-input" class="block text-[11px] font-mono text-slate-400 mb-1">Weather API Endpoint</label>
+                            <input id="item-weatherapi-input" type="text" placeholder="https://api.dev-al-amin.local/v1/weather?city={CITY}"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-cyan-200">
+                        </div>
+                        <div>
+                            <label for="item-freehost-input" class="block text-[11px] font-mono text-slate-400 mb-1">Free Hosting URL (Reviews)</label>
+                            <input id="item-freehost-input" type="text" placeholder="https://www.netlify.com/"
+                                   class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-emerald-300">
+                        </div>
+
+                        <div class="sm:col-span-2 lg:col-span-3">
+                            <label for="item-startercode-input" class="block text-[11px] font-mono text-slate-400 mb-1">Starter Code (for CODE TO FILE MAKE / Templates)</label>
+                            <textarea id="item-startercode-input" rows="3" placeholder="<!DOCTYPE html>..."
+                                      class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-cyan-100"></textarea>
+                        </div>
+
+                        <div class="sm:col-span-2 lg:col-span-3 rounded-2xl bg-[#050b1a] border border-[#4fa3ff]/30 p-3.5 space-y-2.5">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <span class="text-[11px] font-mono font-bold text-[#00e5ff]">Upload File from Device (HTML, TXT, JS, CSS, JSON, ZIP, APK, PDF, Images)</span>
+                                    <p class="text-[10px] text-slate-400">Text/code files load into Starter Code automatically; attached files can be downloaded directly on index.html.</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label for="item-file-upload-input" class="btn-pill-royal px-3 py-1.5 rounded-xl text-[11px] font-mono cursor-pointer">
+                                        Choose File
+                                    </label>
+                                    <button type="button" onclick="clearUploadedItemFile()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/35 text-[11px] font-mono text-rose-300 cursor-pointer">
+                                        Remove File
+                                    </button>
+                                </div>
+                            </div>
+                            <input id="item-file-upload-input" type="file"
+                                   accept=".html,.htm,.txt,.js,.mjs,.cjs,.css,.json,.xml,.svg,.md,.py,.php,.zip,.rar,.7z,.apk,.pdf,.png,.jpg,.jpeg,.webp,.gif,*"
+                                   onchange="handleItemFileUpload(event)"
+                                   class="block w-full text-[11px] font-mono text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#00e5ff] file:text-[#050b1a] cursor-pointer">
+
+                            <div id="item-uploaded-file-meta" class="rounded-xl bg-[#091432] border border-slate-800 px-3 py-2 text-[11px] font-mono text-slate-300 flex flex-wrap items-center justify-between gap-2">
+                                <span id="item-file-status-text">No file attached yet.</span>
+                                <span id="item-file-size-badge" class="text-[#00e5ff]">0 B</span>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2 lg:col-span-3 rounded-2xl bg-[#050b1a] border border-[#4fa3ff]/25 p-3.5 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-mono font-bold text-[#00e5ff]">Tool Links (label, url, note)</span>
+                                <button type="button" onclick="addToolLinkRow()" class="px-2.5 py-1 rounded-lg bg-[#0b2a6f] hover:bg-[#1e63f0] text-[11px] font-mono text-white cursor-pointer">
+                                    + Add Link
+                                </button>
+                            </div>
+                            <div id="tool-links-rows" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="saveVersionItem()" class="btn-pill-cyan w-full py-2.5 rounded-xl text-xs sm:text-sm cursor-pointer">
+                        Save Version Item to Category
+                    </button>
+                </section>
+
+                <section class="static-panel rounded-3xl p-4 sm:p-6 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 id="items-list-heading" class="text-base sm:text-lg font-black text-white">Items in Category</h3>
+                        <span id="items-list-count" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-[#00e5ff]/15 text-[#00e5ff]">0 items</span>
+                    </div>
+                    <div id="category-items-container" class="space-y-2.5"></div>
+                </section>
+            </div>
+
+            <!-- =============================================================
+                 TAB B: LIVE SITE SETTINGS EDITOR (FULL USER PANEL CONTROL)
+            ============================================================== -->
+            <div id="admin-tab-settings" class="hidden">
+                <section class="static-panel rounded-3xl p-4 sm:p-6 space-y-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3.5">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff]">Global Configuration</span>
+                            <h3 class="text-lg sm:text-xl font-black text-white">Live Site Settings — Full User Panel Control (devAlAmin/settings)</h3>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-xl bg-[#00e5ff]/10 border border-[#00e5ff]/30 font-mono text-[10px] text-[#00e5ff]">
+                            SYNCED TO USER PANEL
+                        </span>
+                    </div>
+
+                    <!-- 1. Brand, Hero & Security -->
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-mono uppercase tracking-wider text-[#00e5ff]">1. Brand, Hero &amp; Access Controls</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                            <div>
+                                <label for="set-brandName" class="block text-[11px] font-mono text-slate-400 mb-1">Brand Name (brandName)</label>
+                                <input id="set-brandName" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label for="set-roleTag" class="block text-[11px] font-mono text-slate-400 mb-1">Role Tag (roleTag)</label>
+                                <input id="set-roleTag" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-[#00e5ff]">
+                            </div>
+                            <div>
+                                <label for="set-codeName" class="block text-[11px] font-mono text-slate-400 mb-1">Code File / Snippet Name (codeName)</label>
+                                <input id="set-codeName" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-sky-300">
+                            </div>
+
+                            <div class="sm:col-span-2 lg:col-span-3">
+                                <label for="set-heroDesc" class="block text-[11px] font-mono text-slate-400 mb-1">Hero Description / Subtitle (subtitle &amp; heroDesc)</label>
+                                <textarea id="set-heroDesc" rows="2" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white"></textarea>
+                            </div>
+
+                            <div>
+                                <label for="set-defaultUnlockPassword" class="block text-[11px] font-mono text-slate-400 mb-1">Default Unlock Password (unlockPassword)</label>
+                                <input id="set-defaultUnlockPassword" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-amber-300">
+                            </div>
+                            <div>
+                                <label for="set-adminPassword" class="block text-[11px] font-mono text-slate-400 mb-1">Admin Panel Password</label>
+                                <input id="set-adminPassword" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-emerald-300">
+                            </div>
+                            <div>
+                                <label for="set-videoPreviewTitle" class="block text-[11px] font-mono text-slate-400 mb-1">Video / Cloud Status Label (videoPreviewTitle)</label>
+                                <input id="set-videoPreviewTitle" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-white">
+                            </div>
+
+                            <div class="sm:col-span-2 lg:col-span-3">
+                                <label for="set-announcementBanner" class="block text-[11px] font-mono text-slate-400 mb-1">Announcement Banner (announcementBanner)</label>
+                                <input id="set-announcementBanner" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-[#00e5ff]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Social Links & Contact Channels -->
+                    <div class="space-y-3 border-t border-slate-800/80 pt-4">
+                        <h4 class="text-xs font-mono uppercase tracking-wider text-[#00e5ff]">2. User Panel Social &amp; Contact Links</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                            <div>
+                                <label for="set-telegramUrl" class="block text-[11px] font-mono text-slate-400 mb-1">Telegram URL</label>
+                                <input id="set-telegramUrl" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div>
+                                <label for="set-youtubeUrl" class="block text-[11px] font-mono text-slate-400 mb-1">YouTube URL</label>
+                                <input id="set-youtubeUrl" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div>
+                                <label for="set-tiktokUrl" class="block text-[11px] font-mono text-slate-400 mb-1">TikTok URL</label>
+                                <input id="set-tiktokUrl" type="text" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div>
+                                <label for="set-facebookUrl" class="block text-[11px] font-mono text-slate-400 mb-1">Facebook URL</label>
+                                <input id="set-facebookUrl" type="text" placeholder="https://facebook.com/..." class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div>
+                                <label for="set-whatsappUrl" class="block text-[11px] font-mono text-slate-400 mb-1">WhatsApp URL / Number</label>
+                                <input id="set-whatsappUrl" type="text" placeholder="https://wa.me/880..." class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div>
+                                <label for="set-githubUrl" class="block text-[11px] font-mono text-slate-400 mb-1">GitHub URL</label>
+                                <input id="set-githubUrl" type="text" placeholder="https://github.com/..." class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div>
+                                <label for="set-instagramUrl" class="block text-[11px] font-mono text-slate-400 mb-1">Instagram URL</label>
+                                <input id="set-instagramUrl" type="text" placeholder="https://instagram.com/..." class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-white">
+                            </div>
+                            <div>
+                                <label for="set-supportEmail" class="block text-[11px] font-mono text-slate-400 mb-1">Support Email</label>
+                                <input id="set-supportEmail" type="text" placeholder="support@devalamin.com" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-sky-300">
+                            </div>
+                            <div>
+                                <label for="set-footerText" class="block text-[11px] font-mono text-slate-400 mb-1">Custom Footer Text</label>
+                                <input id="set-footerText" type="text" placeholder="© 2026 DEV AL AMIN • All Rights Reserved" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none text-slate-200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Media, Avatar, Video & Logo -->
+                    <div class="space-y-3 border-t border-slate-800/80 pt-4">
+                        <h4 class="text-xs font-mono uppercase tracking-wider text-[#00e5ff]">3. User Panel Logo, Avatar &amp; Media</h4>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label for="set-heroAvatarUrl" class="block text-[11px] font-mono text-slate-400 mb-1">Hero Avatar / Profile Image URL</label>
+                                <input id="set-heroAvatarUrl" type="text" placeholder="https://.../avatar.png" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-cyan-200">
+                            </div>
+                            <div>
+                                <label for="set-videoPreviewUrl" class="block text-[11px] font-mono text-slate-400 mb-1">Featured Video / Tutorial URL</label>
+                                <input id="set-videoPreviewUrl" type="text" placeholder="https://www.tiktok.com/@alamin_sultanpur" class="w-full px-3 py-2 rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-sky-300">
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl bg-[#050b1a] border border-[#4fa3ff]/30 p-3.5 space-y-3 text-xs">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <span class="text-[11px] font-mono font-bold text-[#00e5ff]">User Panel Logo Upload (PNG, JPG, WEBP, SVG, GIF)</span>
+                                    <p class="text-[10px] text-slate-400">Syncs directly as both <code class="text-cyan-200">logoData</code> and <code class="text-cyan-200">logoUrl</code> to Navbar, Hero &amp; Side Drawer on User Panel.</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label for="set-logo-file-input" class="px-3 py-1.5 rounded-xl bg-[#0b2a6f] hover:bg-[#1e63f0] border border-[#4fa3ff]/35 text-[11px] font-mono font-bold text-white cursor-pointer">
+                                        Upload Logo
+                                    </label>
+                                    <button type="button" onclick="clearUserPanelLogo()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/35 text-[11px] font-mono text-rose-300 cursor-pointer">
+                                        Reset Logo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <input id="set-logo-file-input" type="file"
+                                   accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif,.png,.jpg,.jpeg,.webp,.svg,.gif"
+                                   onchange="handleUserLogoUpload(event)"
+                                   class="hidden">
+
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                                <div class="w-14 h-14 rounded-xl bg-[#091432] border border-[#4fa3ff]/30 flex items-center justify-center overflow-hidden shrink-0 self-center sm:self-auto">
+                                    <img id="set-logo-preview-img" src="" alt="User Panel Logo Preview" class="hidden w-full h-full object-contain p-1">
+                                    <span id="set-logo-preview-fallback" class="font-mono font-black text-xs text-[#00e5ff]">DA</span>
+                                </div>
+
+                                <div class="flex-1 space-y-1.5 min-w-0">
+                                    <label for="set-logoUrl" class="block text-[10px] font-mono text-slate-400">Logo Image URL or Data URL</label>
+                                    <input id="set-logoUrl" type="text" oninput="syncLogoPreviewFromInput()"
+                                           placeholder="https://.../logo.png or data:image/png;base64,..."
+                                           class="w-full px-3 py-2 rounded-xl bg-[#091432] border border-slate-700 focus:border-[#00e5ff] focus:outline-none font-mono text-xs text-cyan-200">
+                                    <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                                        <span id="set-logo-meta-text">Using default DA monogram logo</span>
+                                        <span id="set-logo-size-text" class="text-[#00e5ff]">0 KB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. User Panel Feature Toggles -->
+                    <div class="space-y-3 border-t border-slate-800/80 pt-4">
+                        <h4 class="text-xs font-mono uppercase tracking-wider text-[#00e5ff]">4. User Panel Feature Switches</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
+                            <label class="rounded-xl bg-[#050b1a]/90 border border-slate-800 p-3 flex items-center gap-2.5 cursor-pointer">
+                                <input id="set-showCommunityPopup" type="checkbox" checked class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="font-semibold text-white">Show Community Join Popup</span>
+                            </label>
+                            <label class="rounded-xl bg-[#050b1a]/90 border border-slate-800 p-3 flex items-center gap-2.5 cursor-pointer">
+                                <input id="set-showBanner" type="checkbox" checked class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="font-semibold text-white">Show Announcement Banner</span>
+                            </label>
+                            <label class="rounded-xl bg-[#050b1a]/90 border border-slate-800 p-3 flex items-center gap-2.5 cursor-pointer">
+                                <input id="set-enableCodeToFile" type="checkbox" checked class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="font-semibold text-white">Enable CODE TO FILE MAKE</span>
+                            </label>
+                            <label class="rounded-xl bg-[#050b1a]/90 border border-slate-800 p-3 flex items-center gap-2.5 cursor-pointer">
+                                <input id="set-enableOrders" type="checkbox" checked class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="font-semibold text-white">Enable Order / Request Form</span>
+                            </label>
+                            <label class="rounded-xl bg-[#050b1a]/90 border border-slate-800 p-3 flex items-center gap-2.5 cursor-pointer">
+                                <input id="set-showSearchBar" type="checkbox" checked class="w-4 h-4 accent-[#00e5ff]">
+                                <span class="font-semibold text-white">Show Catalog Search Bar</span>
+                            </label>
+                            <label class="rounded-xl bg-rose-950/35 border border-rose-500/35 p-3 flex items-center gap-2.5 cursor-pointer">
+                                <input id="set-maintenanceMode" type="checkbox" class="w-4 h-4 accent-rose-400">
+                                <span class="font-semibold text-rose-300">Maintenance Mode (User Site)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="saveSiteSettings()" class="btn-pill-cyan w-full py-2.5 rounded-xl text-xs sm:text-sm cursor-pointer">
+                        Save Settings to devAlAmin/settings
+                    </button>
+                </section>
+            </div>
+
+            <!-- =============================================================
+                 TAB C: ORDERS MANAGEMENT
+            ============================================================== -->
+            <div id="admin-tab-orders" class="hidden space-y-4">
+                <section class="static-panel rounded-3xl p-4 sm:p-6 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff]">Incoming Requests</span>
+                            <h3 class="text-lg sm:text-xl font-black text-white">Orders Manager (devAlAmin/orders)</h3>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="addSampleOrderRecord()" class="btn-pill-royal px-3 py-1.5 rounded-xl text-xs cursor-pointer">
+                                + Add Order
+                            </button>
+                            <button type="button" onclick="exportOrdersJson()" class="btn-pill-cyan px-3 py-1.5 rounded-xl text-xs cursor-pointer">
+                                Export Orders JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-1.5 text-xs font-mono">
+                        <button type="button" id="order-filter-all" onclick="setOrderStatusFilter('all')" class="px-3 py-1.5 rounded-xl bg-[#00e5ff] text-[#050b1a] font-bold cursor-pointer">All</button>
+                        <button type="button" id="order-filter-Pending" onclick="setOrderStatusFilter('Pending')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-amber-300 cursor-pointer">Pending</button>
+                        <button type="button" id="order-filter-Approved" onclick="setOrderStatusFilter('Approved')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-sky-300 cursor-pointer">Approved</button>
+                        <button type="button" id="order-filter-Completed" onclick="setOrderStatusFilter('Completed')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-emerald-300 cursor-pointer">Completed</button>
+                        <button type="button" id="order-filter-Cancelled" onclick="setOrderStatusFilter('Cancelled')" class="px-3 py-1.5 rounded-xl bg-slate-800 text-rose-300 cursor-pointer">Cancelled</button>
+                    </div>
+
+                    <div id="orders-list-container" class="space-y-3"></div>
+                </section>
+            </div>
+
+            <!-- =============================================================
+                 TAB D: JSON INSPECTOR & DIRECT IMPORT
+            ============================================================== -->
+            <div id="admin-tab-json" class="hidden">
+                <section class="static-panel rounded-3xl p-4 sm:p-6 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase tracking-widest text-[#00e5ff]">Raw Snapshot</span>
+                            <h3 class="text-lg font-black text-white">JSON Inspector &amp; Bulk Apply</h3>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="refreshJsonInspector()" class="btn-pill-royal px-3 py-1.5 rounded-xl text-xs cursor-pointer">Refresh</button>
+                            <button type="button" onclick="copyJsonInspector()" class="btn-pill-royal px-3 py-1.5 rounded-xl text-xs cursor-pointer">Copy JSON</button>
+                            <button type="button" onclick="applyJsonInspector()" class="btn-pill-cyan px-3.5 py-1.5 rounded-xl text-xs cursor-pointer">Apply JSON</button>
+                        </div>
+                    </div>
+                    <textarea id="json-inspector-area" rows="16" spellcheck="false"
+                              class="w-full rounded-2xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none p-3.5 text-xs font-mono text-cyan-200"></textarea>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- =====================================================================
+         JSON IMPORT MODAL
+    ====================================================================== -->
+    <div id="import-json-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#02050e]/85 p-4">
+        <div class="w-full max-w-2xl static-panel rounded-3xl p-5 sm:p-6 space-y-3.5 border-[#00e5ff]/50">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-black text-white">Import JSON Data</h3>
+                <button type="button" onclick="closeImportJsonModal()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-300 hover:text-rose-400 flex items-center justify-center cursor-pointer">✕</button>
+            </div>
+            <p class="text-xs text-slate-300">
+                Paste JSON containing <code class="text-[#00e5ff]">catalog</code>, <code class="text-[#4fa3ff]">settings</code>, and/or <code class="text-emerald-300">orders</code> (or a full <code class="text-cyan-200">{ devAlAmin: { ... } }</code> object).
+            </p>
+            <textarea id="import-json-input" rows="10" placeholder='{"catalog": {...}, "settings": {...}, "orders": {...}}'
+                      class="w-full rounded-xl bg-[#050b1a] border border-slate-700 focus:border-[#00e5ff] focus:outline-none p-3 text-xs font-mono text-cyan-100"></textarea>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeImportJsonModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold text-slate-300 cursor-pointer">Cancel</button>
+                <button type="button" onclick="confirmImportJson()" class="btn-pill-cyan px-4 py-2 rounded-xl text-xs cursor-pointer">Import &amp; Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         CORE AUTH & TOAST SCRIPT (NON-MODULE FOR GUARANTEED EXECUTION)
+    ====================================================================== -->
+    <script>
+        const ADMIN_BACKUP_KEY = 'dev_alamin_admin_backup_v1';
+        const ADMIN_AUTH_KEY = 'dev_alamin_admin_auth_ok';
+
+        function showAdminToast(msg, type) {
+            const box = document.getElementById('admin-toast-box');
+            if (!box) return;
+            const el = document.createElement('div');
+            const tone = type === 'error'
+                ? 'border-rose-500/60 text-rose-200 bg-rose-950'
+                : 'border-[#00e5ff]/60 text-white glass-bar';
+            el.className = 'px-4 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold shadow-xl ' + tone;
+            el.textContent = msg;
+            box.appendChild(el);
+            setTimeout(function () {
+                el.remove();
+            }, 2500);
+        }
+
+        function getActiveSavedAdminPassword() {
+            try {
+                const raw = localStorage.getItem(ADMIN_BACKUP_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && parsed.settings && typeof parsed.settings.adminPassword === 'string') {
+                        const saved = parsed.settings.adminPassword.trim();
+                        if (saved.length > 0) return saved;
+                    }
+                }
+            } catch (_) {}
+            return 'ALAMIN';
+        }
+
+        function updateAdminAuthView(isLoggedIn) {
+            const loginCard = document.getElementById('admin-login-card');
+            const dashWrap = document.getElementById('admin-dashboard-wrap');
+            const lockBtn = document.getElementById('btn-header-lock');
+            if (isLoggedIn) {
+                if (loginCard) loginCard.classList.add('hidden');
+                if (dashWrap) dashWrap.classList.remove('hidden');
+                if (lockBtn) lockBtn.classList.remove('hidden');
+            } else {
+                if (loginCard) loginCard.classList.remove('hidden');
+                if (dashWrap) dashWrap.classList.add('hidden');
+                if (lockBtn) lockBtn.classList.add('hidden');
+            }
+        }
+
+        function toggleLoginPasswordVisibility() {
+            const input = document.getElementById('admin-login-pass');
+            if (!input) return;
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function loginAdminPanel() {
+            const passInput = document.getElementById('admin-login-pass');
+            const entered = (passInput && passInput.value ? passInput.value : '').trim();
+
+            if (!entered) {
+                showAdminToast('Admin password is required!', 'error');
+                if (passInput) passInput.focus();
+                return;
+            }
+
+            const expected = getActiveSavedAdminPassword();
+            if (entered.toLowerCase() === expected.toLowerCase()) {
+                sessionStorage.setItem(ADMIN_AUTH_KEY, '1');
+                if (passInput) passInput.value = '';
+                updateAdminAuthView(true);
+                if (typeof window.onAdminUnlocked === 'function') {
+                    window.onAdminUnlocked();
+                }
+                showAdminToast('Password verified — Admin Panel unlocked!', 'success');
+            } else {
+                sessionStorage.removeItem(ADMIN_AUTH_KEY);
+                updateAdminAuthView(false);
+                showAdminToast('Incorrect admin password! Access denied.', 'error');
+                if (passInput) passInput.focus();
+            }
+        }
+
+        function lockAdminSession() {
+            sessionStorage.removeItem(ADMIN_AUTH_KEY);
+            const passInput = document.getElementById('admin-login-pass');
+            if (passInput) passInput.value = '';
+            updateAdminAuthView(false);
+            showAdminToast('Admin panel locked.', 'success');
+        }
+    </script>
+
+    <!-- =====================================================================
+         FIREBASE RTDB (v10 MODULAR) & ADMIN CONTROLLER
+    ====================================================================== -->
+    <script type="module">
+        import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, onValue, set, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const SHARED_FB_KEY = 'dev_alamin_shared_fb_config';
+        const LOCAL_BACKUP_KEY = 'dev_alamin_admin_backup_v1';
+        const SESSION_AUTH_KEY = 'dev_alamin_admin_auth_ok';
+
+        const DEFAULT_CATEGORIES = [
+            { key: 'free-website', title: 'Free Website', badge: '100% FREE', tag: 'HOT', icon: '🌐', order: 1, gradient: 'from-[#00e5ff]/25 via-[#1e63f0]/35 to-[#0b2a6f]', summary: 'TopUp, UID, AI & Bio sites' },
+            { key: 'apk-building', title: 'APK Building', badge: '100% FREE', tag: 'APP', icon: '📱', order: 2, gradient: 'from-[#1e63f0]/30 via-[#0b2a6f]/40 to-[#050b1a]', summary: 'DEV AL AMIN HTML to APK Compiler' },
+            { key: 'bot-making', title: 'Bot Making', badge: '100% FREE', tag: '24/7', icon: '🤖', order: 3, gradient: 'from-[#00e5ff]/20 via-[#0b2a6f]/45 to-[#050b1a]', summary: 'Telegram UID, Temp & TopUp Bots' },
+            { key: 'api-keys', title: 'API Key', badge: '100% FREE', tag: 'API', icon: '🔑', order: 4, gradient: 'from-[#1e63f0]/25 via-[#00e5ff]/15 to-[#050b1a]', summary: 'UID, Gemini AI & Gaming APIs' },
+            { key: 'security', title: 'Security', badge: '100% FREE', tag: 'SHIELD', icon: '🛡️', order: 5, gradient: 'from-[#0b2a6f]/50 via-[#1e63f0]/25 to-[#050b1a]', summary: 'HTML/JS Protector & Anti-Mod' },
+            { key: 'pc-mobile-tools', title: 'PC Tools', badge: '100% FREE', tag: 'UTIL', icon: '🛠️', order: 6, gradient: 'from-[#0b2a6f]/45 via-[#00e5ff]/20 to-[#050b1a]', summary: 'Notepad, Color Picker & Hosting' },
+            { key: 'reviews', title: 'Review', badge: '100% FREE', tag: 'REVIEWS', icon: '⭐', order: 7, gradient: 'from-[#00e5ff]/20 via-[#1e63f0]/25 to-[#0b2a6f]', summary: 'Hosting & Bot Setup Tutorials' },
+            { key: 'code-to-file-make', title: 'CODE TO FILE MAKE', badge: '100% FREE', tag: 'MAKER', icon: '📄', order: 8, gradient: 'from-[#00e5ff]/30 via-[#1e63f0]/40 to-[#0b2a6f]', summary: 'Turn HTML/code into downloadable file' }
+        ];
+
+        function buildStarterCatalog() {
+            const catalog = {};
+            DEFAULT_CATEGORIES.forEach(cat => {
+                catalog[cat.key] = {
+                    ...cat,
+                    items: []
+                };
+            });
+
+            catalog['free-website'].items = [
+                {
+                    id: 'web_v1_0',
+                    title: 'TikTok Facebook video download',
+                    version: 'Version 1.0',
+                    tag: 'HOT',
+                    subtitle: 'Social Media Downloader Web App',
+                    description: 'TikTok Facebook video download',
+                    chips: 'Netlify, GitHub, Catbox',
+                    locked: false,
+                    lockPass: '',
+                    visible: true,
+                    featured: true,
+                    keyHint: '',
+                    downloadUrl: '#',
+                    videoUrl: 'https://www.tiktok.com/@alamin_sultanpur',
+                    thumbnailUrl: '',
+                    renderBuildCmd: '',
+                    renderStartCmd: '',
+                    uidCheckerApi: '',
+                    weatherApi: '',
+                    ffxServerUrl: 'https://render.com/',
+                    freeHostingUrl: 'https://www.netlify.com/',
+                    isBot: false,
+                    isApiKey: false,
+                    isReview: false,
+                    starterCode: '<h1>TikTok Facebook video download</h1>',
+                    fileAttachment: null,
+                    toolLinks: [{ label: 'Netlify', url: 'https://app.netlify.com/drop', note: 'Instant static deploy' }]
+                }
+            ];
+
+            catalog['bot-making'].items = [
+                {
+                    id: 'bot_v1_0',
+                    title: 'Telegram Bot v1.0 Starter',
+                    version: 'BOT V1.0',
+                    tag: 'FREE',
+                    subtitle: '24/7 Ready Telegram Bot',
+                    description: 'Get the final project file',
+                    chips: 'Render, BotFather, UptimeRobot',
+                    locked: false,
+                    lockPass: '',
+                    visible: true,
+                    featured: true,
+                    keyHint: '',
+                    downloadUrl: '#',
+                    videoUrl: 'https://www.tiktok.com/@alamin_sultanpur',
+                    thumbnailUrl: '',
+                    renderBuildCmd: 'npm install',
+                    renderStartCmd: 'node index.js',
+                    uidCheckerApi: '',
+                    weatherApi: '',
+                    ffxServerUrl: 'https://render.com/',
+                    freeHostingUrl: 'https://www.netlify.com/',
+                    isBot: true,
+                    isApiKey: false,
+                    isReview: false,
+                    starterCode: '',
+                    fileAttachment: null,
+                    toolLinks: []
+                }
+            ];
+
+            catalog['api-keys'].items = [
+                {
+                    id: 'api_v1_0',
+                    title: 'FREE FIRE UID CHECKER API & LIVE WEATHER API',
+                    version: 'Version 1.0',
+                    tag: 'FREE API',
+                    subtitle: 'Player UID & Weather Endpoints',
+                    description: 'All free API coming soon',
+                    chips: 'UID CHECKER API, WEATHER API',
+                    locked: false,
+                    lockPass: '',
+                    visible: true,
+                    featured: true,
+                    keyHint: '',
+                    downloadUrl: '#',
+                    videoUrl: 'https://www.tiktok.com/@alamin_sultanpur',
+                    thumbnailUrl: '',
+                    renderBuildCmd: '',
+                    renderStartCmd: '',
+                    uidCheckerApi: 'https://api.dev-al-amin.local/v1/ff-uid?uid={UID}',
+                    weatherApi: 'https://api.dev-al-amin.local/v1/weather?city={CITY}',
+                    ffxServerUrl: 'https://render.com/',
+                    freeHostingUrl: 'https://www.netlify.com/',
+                    isBot: false,
+                    isApiKey: true,
+                    isReview: false,
+                    starterCode: '',
+                    fileAttachment: null,
+                    toolLinks: []
+                }
+            ];
+
+            catalog['reviews'].items = [
+                {
+                    id: 'rev_v1_0',
+                    title: 'Connect FFX Server & Free Hosting',
+                    version: 'Review v1.0',
+                    tag: 'REVIEWS',
+                    subtitle: 'FFX Server & Hosting Setup',
+                    description: 'Access and connect to the main server & Get free hosting for your website',
+                    chips: 'FFX Server, Free Hosting',
+                    locked: false,
+                    lockPass: '',
+                    visible: true,
+                    featured: true,
+                    keyHint: '',
+                    downloadUrl: '#',
+                    videoUrl: 'https://www.tiktok.com/@alamin_sultanpur',
+                    thumbnailUrl: '',
+                    renderBuildCmd: '',
+                    renderStartCmd: '',
+                    uidCheckerApi: '',
+                    weatherApi: '',
+                    ffxServerUrl: 'https://render.com/',
+                    freeHostingUrl: 'https://www.netlify.com/',
+                    isBot: false,
+                    isApiKey: false,
+                    isReview: true,
+                    starterCode: '',
+                    fileAttachment: null,
+                    toolLinks: []
+                }
+            ];
+
+            catalog['code-to-file-make'].items = [
+                {
+                    id: 'ctf_html_maker',
+                    title: 'CODE TO FILE MAKE — HTML / Code Exporter',
+                    version: 'Maker v1.0',
+                    tag: '100% FREE',
+                    subtitle: 'Instant File Generator (.html, .txt, .js, .css, .json)',
+                    description: 'Paste or write HTML or code, pick filename and extension, preview and download a real file.',
+                    chips: '.html, .txt, .js, .css, .json',
+                    locked: false,
+                    lockPass: '',
+                    visible: true,
+                    featured: true,
+                    keyHint: '',
+                    downloadUrl: 'OPEN_CODE_TO_FILE',
+                    videoUrl: 'https://www.tiktok.com/@alamin_sultanpur',
+                    thumbnailUrl: '',
+                    renderBuildCmd: '',
+                    renderStartCmd: '',
+                    uidCheckerApi: '',
+                    weatherApi: '',
+                    ffxServerUrl: 'https://render.com/',
+                    freeHostingUrl: 'https://www.netlify.com/',
+                    isBot: false,
+                    isApiKey: false,
+                    isReview: false,
+                    starterCode: '<!DOCTYPE html><html><head><title>DEV AL AMIN</title></head><body><h1>Hello from CODE TO FILE MAKE</h1></body></html>',
+                    fileAttachment: null,
+                    toolLinks: [{ label: 'Launch Maker', url: 'index.html', note: 'Available on index.html' }]
+                }
+            ];
+
+            return catalog;
+        }
+
+        function buildDefaultSettings() {
+            return {
+                brandName: 'DEV AL AMIN',
+                roleTag: 'CREATOR HUB • DEV AL AMIN',
+                subtitle: 'Web Templates • Android APK • Telegram Bots • CODE TO FILE MAKE • Dev Tools',
+                heroDesc: 'Web Templates • Android APK • Telegram Bots • CODE TO FILE MAKE • Dev Tools',
+                telegramUrl: 'https://t.me/alamin165446',
+                youtubeUrl: 'https://youtube.com',
+                tiktokUrl: 'https://www.tiktok.com/@alamin_sultanpur',
+                facebookUrl: '',
+                whatsappUrl: '',
+                githubUrl: '',
+                instagramUrl: '',
+                supportEmail: '',
+                footerText: '© 2026 DEV AL AMIN • All Rights Reserved',
+                logoUrl: '',
+                logoData: '',
+                heroAvatarUrl: '',
+                videoPreviewUrl: 'https://www.tiktok.com/@alamin_sultanpur',
+                unlockPassword: 'ALAMIN',
+                defaultUnlockPassword: 'ALAMIN',
+                adminPassword: 'ALAMIN',
+                announcementBanner: '',
+                videoPreviewTitle: 'Render / Netlify / GitHub Ready',
+                codeName: 'dev-al-amin.js',
+                showCommunityPopup: true,
+                showBanner: true,
+                enableCodeToFile: true,
+                enableOrders: true,
+                showSearchBar: true,
+                maintenanceMode: false
+            };
+        }
+
+        function buildStarterOrders() {
+            return {
+                ord_1001: {
+                    id: 'ord_1001',
+                    customerName: 'Demo User',
+                    contact: '@alamin165446',
+                    itemTitle: 'Free Fire TopUp Website Source',
+                    amount: 'FREE',
+                    status: 'Pending',
+                    note: 'Sample request entry',
+                    createdAt: new Date().toISOString()
+                }
+            };
+        }
+
+        let db = null;
+        let isFbConnected = false;
+        let activeAdminTab = 'catalog';
+        let catalogState = buildStarterCatalog();
+        let settingsState = buildDefaultSettings();
+        let ordersState = buildStarterOrders();
+        let orderStatusFilter = 'all';
+        let selectedCategoryKey = 'free-website';
+        let currentUploadedFileAttachment = null;
+        let currentLogoMeta = { name: '', type: '', size: 0 };
+        const MAX_INLINE_FILE_BYTES = 2 * 1024 * 1024;
+        const MAX_LOGO_FILE_BYTES = 1.5 * 1024 * 1024;
+
+        function isSessionUnlocked() {
+            return sessionStorage.getItem(SESSION_AUTH_KEY) === '1';
+        }
+
+        function normalizeCatalog(raw) {
+            const starter = buildStarterCatalog();
+            if (!raw || typeof raw !== 'object') return starter;
+
+            const result = {};
+            Object.entries(raw).forEach(([catKey, catVal]) => {
+                if (!catVal || typeof catVal !== 'object') return;
+                const safeKey = String(catKey).trim();
+                if (!safeKey) return;
+
+                let itemsArr = [];
+                if (Array.isArray(catVal.items)) {
+                    itemsArr = catVal.items.filter(Boolean);
+                } else if (catVal.items && typeof catVal.items === 'object') {
+                    itemsArr = Object.entries(catVal.items).map(([k, v]) => ({ id: k, ...(v || {}) }));
+                }
+
+                result[safeKey] = {
+                    key: safeKey,
+                    title: catVal.title || safeKey.toUpperCase(),
+                    badge: catVal.badge || '100% FREE',
+                    tag: catVal.tag || 'FREE',
+                    icon: catVal.icon || '📦',
+                    order: Number.isFinite(Number(catVal.order)) ? Number(catVal.order) : 99,
+                    gradient: catVal.gradient || 'from-[#00e5ff]/25 via-[#1e63f0]/35 to-[#0b2a6f]',
+                    summary: catVal.summary || '',
+                    items: itemsArr.map((it, idx) => ({
+                        id: it.id || `${safeKey}_item_${idx + 1}`,
+                        title: it.title || 'Untitled Item',
+                        version: it.version || it.ver || 'Version 1.0',
+                        tag: it.tag || (it.locked ? 'KEY' : 'FREE'),
+                        subtitle: it.subtitle || '',
+                        description: it.description || it.desc || '',
+                        chips: it.chips || '',
+                        locked: Boolean(it.locked) || Boolean(it.lockPass),
+                        lockPass: it.lockPass || '',
+                        visible: it.visible === undefined ? true : Boolean(it.visible),
+                        featured: Boolean(it.featured),
+                        keyHint: it.keyHint || it.lockPass || '',
+                        downloadUrl: it.downloadUrl || '#',
+                        videoUrl: it.videoUrl || '',
+                        thumbnailUrl: it.thumbnailUrl || it.thumbUrl || it.imageUrl || it.image || '',
+                        renderBuildCmd: it.renderBuildCmd || '',
+                        renderStartCmd: it.renderStartCmd || '',
+                        uidCheckerApi: it.uidCheckerApi || '',
+                        weatherApi: it.weatherApi || '',
+                        ffxServerUrl: it.ffxServerUrl || '',
+                        freeHostingUrl: it.freeHostingUrl || '',
+                        isBot: Boolean(it.isBot),
+                        isApiKey: Boolean(it.isApiKey),
+                        isReview: Boolean(it.isReview),
+                        starterCode: it.starterCode || '',
+                        fileAttachment: it.fileAttachment && typeof it.fileAttachment === 'object' ? {
+                            name: it.fileAttachment.name || 'resource.txt',
+                            type: it.fileAttachment.type || 'application/octet-stream',
+                            size: Number(it.fileAttachment.size) || 0,
+                            dataUrl: it.fileAttachment.dataUrl || ''
+                        } : null,
+                        toolLinks: Array.isArray(it.toolLinks) ? it.toolLinks : []
+                    }))
+                };
+            });
+
+            return Object.keys(result).length ? result : starter;
+        }
+
+        function normalizeOrders(raw) {
+            if (!raw || typeof raw !== 'object') return {};
+            const out = {};
+            const entries = Array.isArray(raw)
+                ? raw.map((v, i) => [v?.id || `ord_${i + 1}`, v])
+                : Object.entries(raw);
+            entries.forEach(([key, val]) => {
+                if (!val || typeof val !== 'object') return;
+                const id = String(val.id || key).trim();
+                if (!id) return;
+                out[id] = {
+                    id,
+                    customerName: String(val.customerName || 'Guest User'),
+                    contact: String(val.contact || ''),
+                    itemTitle: String(val.itemTitle || 'Resource Request'),
+                    amount: String(val.amount || 'FREE'),
+                    status: ['Pending', 'Approved', 'Completed', 'Cancelled'].includes(val.status) ? val.status : 'Pending',
+                    note: String(val.note || ''),
+                    createdAt: String(val.createdAt || new Date().toISOString())
+                };
+            });
+            return out;
+        }
+
+        function saveLocalBackup() {
+            try {
+                localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify({
+                    catalog: catalogState,
+                    settings: settingsState,
+                    orders: ordersState
+                }));
+            } catch (_) {}
+        }
+
+        function loadLocalBackup() {
+            try {
+                const raw = localStorage.getItem(LOCAL_BACKUP_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (parsed.catalog) catalogState = normalizeCatalog(parsed.catalog);
+                if (parsed.settings && typeof parsed.settings === 'object') {
+                    settingsState = { ...buildDefaultSettings(), ...parsed.settings };
+                    if (parsed.settings.adminPassword !== undefined && String(parsed.settings.adminPassword).trim() !== '') {
+                        settingsState.adminPassword = String(parsed.settings.adminPassword).trim();
+                    } else {
+                        settingsState.adminPassword = 'ALAMIN';
+                    }
+                }
+                if (parsed.orders) ordersState = normalizeOrders(parsed.orders);
+            } catch (_) {}
+        }
+
+        function setFbBadge(connected, labelText) {
+            const badge = document.getElementById('fb-status-badge');
+            if (!badge) return;
+            if (connected) {
+                badge.textContent = labelText || 'FIREBASE LIVE';
+                badge.className = 'px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-400/40';
+            } else {
+                badge.textContent = labelText || 'LOCAL / OFFLINE';
+                badge.className = 'px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-400/35';
+            }
+        }
+
+        function fillConfigInputs(cfg) {
+            if (!cfg) return;
+            document.getElementById('fb-database-url').value = cfg.databaseURL || '';
+            document.getElementById('fb-api-key').value = cfg.apiKey || '';
+            document.getElementById('fb-project-id').value = cfg.projectId || '';
+            document.getElementById('fb-app-id').value = cfg.appId || '';
+            document.getElementById('fb-auth-domain').value = cfg.authDomain || '';
+            document.getElementById('fb-storage-bucket').value = cfg.storageBucket || '';
+            document.getElementById('fb-sender-id').value = cfg.messagingSenderId || '';
+        }
+
+        function readConfigFromInputs() {
+            const databaseURL = (document.getElementById('fb-database-url').value || '').trim().replace(/\/+$/, '');
+            if (!databaseURL) return null;
+            const cfg = { databaseURL };
+            const apiKey = document.getElementById('fb-api-key').value.trim();
+            const projectId = document.getElementById('fb-project-id').value.trim();
+            const appId = document.getElementById('fb-app-id').value.trim();
+            const authDomain = document.getElementById('fb-auth-domain').value.trim();
+            const storageBucket = document.getElementById('fb-storage-bucket').value.trim();
+            const messagingSenderId = document.getElementById('fb-sender-id').value.trim();
+
+            if (apiKey) cfg.apiKey = apiKey;
+            if (projectId) cfg.projectId = projectId;
+            if (appId) cfg.appId = appId;
+            if (authDomain) cfg.authDomain = authDomain;
+            if (storageBucket) cfg.storageBucket = storageBucket;
+            if (messagingSenderId) cfg.messagingSenderId = messagingSenderId;
+            return cfg;
+        }
+
+        function parseConfigSnippet(rawText) {
+            const trimmed = (rawText || '').trim();
+            if (!trimmed) throw new Error('Empty config input');
+
+            if (/^https?:\/\/.+/i.test(trimmed) && !trimmed.startsWith('{')) {
+                return { databaseURL: trimmed.replace(/\/+$/, '') };
+            }
+
+            const braceStart = trimmed.indexOf('{');
+            const braceEnd = trimmed.lastIndexOf('}');
+            if (braceStart !== -1 && braceEnd > braceStart) {
+                const body = trimmed.slice(braceStart, braceEnd + 1);
+                try {
+                    return JSON.parse(body);
+                } catch (_) {
+                    const jsonified = body
+                        .replace(/\/\/.*$/gm, '')
+                        .replace(/(['"])?([a-zA-Z0-9_]+)(['"])?\s*:/g, '"$2":')
+                        .replace(/'/g, '"')
+                        .replace(/,\s*([}\]])/g, '$1');
+                    return JSON.parse(jsonified);
+                }
+            }
+
+            throw new Error('Could not parse Firebase config');
+        }
+
+        window.applyPastedFirebaseConfig = function() {
+            const raw = document.getElementById('fb-paste-config').value;
+            try {
+                const parsed = parseConfigSnippet(raw);
+                if (!parsed.databaseURL) {
+                    showAdminToast('Parsed config is missing databaseURL.', 'error');
+                    return;
+                }
+                fillConfigInputs(parsed);
+                showAdminToast('Parsed Firebase config into fields!', 'success');
+            } catch (err) {
+                showAdminToast(err.message || 'Invalid Firebase config snippet.', 'error');
+            }
+        };
+
+        async function initFirebaseClient(cfg, showFeedback = false) {
+            if (!cfg || !cfg.databaseURL) {
+                isFbConnected = false;
+                setFbBadge(false, 'LOCAL / OFFLINE');
+                return false;
+            }
+
+            try {
+                for (const existing of getApps()) {
+                    await deleteApp(existing);
+                }
+                const fbApp = initializeApp(cfg);
+                db = getDatabase(fbApp);
+
+                onValue(ref(db, 'devAlAmin/catalog'), (snap) => {
+                    isFbConnected = true;
+                    setFbBadge(true, 'FIREBASE LIVE');
+                    if (snap.exists() && snap.val()) {
+                        catalogState = normalizeCatalog(snap.val());
+                        saveLocalBackup();
+                        if (isSessionUnlocked()) refreshDashboardViews();
+                    }
+                }, () => {
+                    isFbConnected = false;
+                    setFbBadge(false, 'RULES / READ ERR');
+                    if (showFeedback) showAdminToast('Firebase read failed. Check RTDB rules.', 'error');
+                });
+
+                onValue(ref(db, 'devAlAmin/settings'), (snap) => {
+                    if (snap.exists() && snap.val() && typeof snap.val() === 'object') {
+                        const remote = snap.val();
+                        const localPass = getActiveSavedAdminPassword();
+                        const remotePass = (remote.adminPassword !== undefined && String(remote.adminPassword).trim() !== '')
+                            ? String(remote.adminPassword).trim()
+                            : '';
+                        settingsState = {
+                            ...buildDefaultSettings(),
+                            ...settingsState,
+                            ...remote,
+                            adminPassword: remotePass || localPass || 'ALAMIN'
+                        };
+                        saveLocalBackup();
+                        if (isSessionUnlocked()) {
+                            populateSettingsForm();
+                            refreshJsonInspector();
+                        }
+                    }
+                });
+
+                onValue(ref(db, 'devAlAmin/orders'), (snap) => {
+                    if (snap.exists() && snap.val()) {
+                        ordersState = normalizeOrders(snap.val());
+                        saveLocalBackup();
+                        if (isSessionUnlocked()) {
+                            updateSummaryCounts();
+                            renderOrdersList();
+                            refreshJsonInspector();
+                        }
+                    }
+                });
+
+                if (showFeedback) showAdminToast('Connected to Firebase Realtime Database!', 'success');
+                return true;
+            } catch (err) {
+                console.error(err);
+                isFbConnected = false;
+                setFbBadge(false, 'CONFIG ERROR');
+                if (showFeedback) showAdminToast('Failed to initialize Firebase.', 'error');
+                return false;
+            }
+        }
+
+        window.connectAndSaveFirebase = async function() {
+            try {
+                const pasteVal = document.getElementById('fb-paste-config').value.trim();
+                if (pasteVal && !document.getElementById('fb-database-url').value.trim()) {
+                    try {
+                        fillConfigInputs(parseConfigSnippet(pasteVal));
+                    } catch (_) {}
+                }
+
+                const cfg = readConfigFromInputs();
+                if (!cfg || !cfg.databaseURL) {
+                    showAdminToast('Please provide a valid Firebase databaseURL.', 'error');
+                    return;
+                }
+
+                localStorage.setItem(SHARED_FB_KEY, JSON.stringify(cfg));
+                document.getElementById('fb-paste-config').value = JSON.stringify(cfg, null, 2);
+                await initFirebaseClient(cfg, true);
+            } catch (err) {
+                showAdminToast('Error saving Firebase config.', 'error');
+            }
+        };
+
+        window.testFirebaseConnection = async function() {
+            try {
+                const cfg = readConfigFromInputs();
+                if (!cfg || !cfg.databaseURL) {
+                    showAdminToast('Enter databaseURL first to test.', 'error');
+                    return;
+                }
+                const ok = await initFirebaseClient(cfg, false);
+                if (!ok || !db) return;
+
+                await get(ref(db, 'devAlAmin'));
+                isFbConnected = true;
+                setFbBadge(true, 'CONNECTION OK');
+                showAdminToast('Connection test succeeded (devAlAmin reachable)!', 'success');
+            } catch (_) {
+                setFbBadge(false, 'TEST FAILED');
+                showAdminToast('Connection test failed. Verify databaseURL & RTDB rules.', 'error');
+            }
+        };
+
+        window.clearFirebaseConfig = async function() {
+            try {
+                localStorage.removeItem(SHARED_FB_KEY);
+                ['fb-paste-config', 'fb-database-url', 'fb-api-key', 'fb-project-id', 'fb-app-id', 'fb-auth-domain', 'fb-storage-bucket', 'fb-sender-id'].forEach(id => {
+                    document.getElementById(id).value = '';
+                });
+                for (const existing of getApps()) {
+                    await deleteApp(existing);
+                }
+                db = null;
+                isFbConnected = false;
+                setFbBadge(false, 'LOCAL / OFFLINE');
+                showAdminToast('Cleared Firebase configuration.', 'success');
+            } catch (_) {
+                showAdminToast('Could not clear Firebase instance.', 'error');
+            }
+        };
+
+        window.toggleRtdbRulesBox = function() {
+            document.getElementById('rtdb-rules-panel').classList.toggle('hidden');
+        };
+
+        window.copyRtdbRules = function() {
+            const txt = document.getElementById('rtdb-rules-code').textContent;
+            copyToClipboard(txt, 'Copied RTDB rules!');
+        };
+
+        window.onAdminUnlocked = function() {
+            loadLocalBackup();
+            refreshDashboardViews();
+            switchAdminTab(activeAdminTab || 'catalog');
+        };
+
+        // Tabs
+        window.switchAdminTab = function(tabName) {
+            if (!isSessionUnlocked()) {
+                updateAdminAuthView(false);
+                showAdminToast('Please unlock with your admin password first.', 'error');
+                return;
+            }
+            const validTabs = ['catalog', 'settings', 'orders', 'json'];
+            const targetTab = validTabs.includes(tabName) ? tabName : 'catalog';
+            activeAdminTab = targetTab;
+
+            validTabs.forEach(name => {
+                const panel = document.getElementById(`admin-tab-${name}`);
+                const btn = document.getElementById(`tab-btn-${name}`);
+                if (!panel || !btn) return;
+                if (name === targetTab) {
+                    panel.classList.remove('hidden');
+                    btn.className = 'btn-pill-cyan py-2.5 px-3 rounded-2xl text-xs sm:text-sm font-display font-extrabold cursor-pointer';
+                } else {
+                    panel.classList.add('hidden');
+                    btn.className = 'btn-pill-royal py-2.5 px-3 rounded-2xl text-xs sm:text-sm font-display font-bold cursor-pointer';
+                }
+            });
+
+            if (targetTab === 'json') refreshJsonInspector();
+            if (targetTab === 'settings') populateSettingsForm();
+            if (targetTab === 'orders') renderOrdersList();
+        };
+
+        async function persistCatalogToFirebase() {
+            saveLocalBackup();
+            refreshJsonInspector();
+            updateSummaryCounts();
+            if (db && isFbConnected) {
+                try {
+                    await set(ref(db, 'devAlAmin/catalog'), catalogState);
+                    showAdminToast('Synced catalog to devAlAmin/catalog!', 'success');
+                } catch (_) {
+                    showAdminToast('Saved locally; Firebase write denied by rules.', 'error');
+                }
+            } else {
+                showAdminToast('Saved locally (connect Firebase to sync live).', 'success');
+            }
+        }
+
+        async function persistSettingsToFirebase() {
+            saveLocalBackup();
+            refreshJsonInspector();
+            if (db && isFbConnected) {
+                try {
+                    await set(ref(db, 'devAlAmin/settings'), settingsState);
+                    showAdminToast('Synced settings to devAlAmin/settings!', 'success');
+                } catch (_) {
+                    showAdminToast('Saved locally; Firebase write denied by rules.', 'error');
+                }
+            } else {
+                showAdminToast('Saved settings locally.', 'success');
+            }
+        }
+
+        async function persistOrdersToFirebase() {
+            saveLocalBackup();
+            refreshJsonInspector();
+            updateSummaryCounts();
+            if (db && isFbConnected) {
+                try {
+                    await set(ref(db, 'devAlAmin/orders'), ordersState);
+                    showAdminToast('Synced orders to devAlAmin/orders!', 'success');
+                } catch (_) {
+                    showAdminToast('Saved orders locally; Firebase write denied by rules.', 'error');
+                }
+            } else {
+                showAdminToast('Saved orders locally.', 'success');
+            }
+        }
+
+        function getSortedCategories() {
+            return Object.values(catalogState).sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+        }
+
+        function updateSummaryCounts() {
+            const sorted = getSortedCategories();
+            const totalItems = sorted.reduce((acc, c) => acc + ((c.items && c.items.length) || 0), 0);
+            const totalOrders = Object.keys(ordersState || {}).length;
+            document.getElementById('summary-cat-count').textContent = sorted.length;
+            document.getElementById('summary-item-count').textContent = totalItems;
+            document.getElementById('summary-order-count').textContent = totalOrders;
+            const tabBadge = document.getElementById('tab-orders-badge');
+            if (tabBadge) tabBadge.textContent = totalOrders;
+        }
+
+        function renderCategoryPills() {
+            const sorted = getSortedCategories();
+            if (!catalogState[selectedCategoryKey] && sorted.length) {
+                selectedCategoryKey = sorted[0].key;
+            }
+            const wrap = document.getElementById('category-pill-list');
+            wrap.innerHTML = sorted.map(cat => {
+                const active = cat.key === selectedCategoryKey;
+                const count = (cat.items || []).length;
+                return `
+                    <button type="button" onclick="selectCategory('${cat.key}')"
+                            class="px-3 py-2 rounded-xl text-xs font-mono font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                                active
+                                    ? 'bg-[#00e5ff] text-[#050b1a]'
+                                    : 'bg-[#091432] hover:bg-[#0b2a6f] text-slate-200 border border-[#4fa3ff]/25'
+                            }">
+                        <span>${cat.icon || '📦'}</span>
+                        <span>${cat.title}</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[10px] ${active ? 'bg-[#050b1a]/20 text-[#050b1a]' : 'bg-slate-800 text-[#00e5ff]'}">${count}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        window.selectCategory = function(key) {
+            selectedCategoryKey = key;
+            renderCategoryPills();
+            loadCategoryIntoForm(key);
+            resetItemForm();
+            renderCategoryItems();
+        };
+
+        function loadCategoryIntoForm(key) {
+            const cat = catalogState[key];
+            if (!cat) return;
+            document.getElementById('cat-mode').value = 'edit';
+            document.getElementById('cat-original-key').value = cat.key;
+            document.getElementById('cat-form-heading').textContent = `Edit Category: ${cat.title} (${cat.key})`;
+            document.getElementById('cat-key-input').value = cat.key;
+            document.getElementById('cat-title-input').value = cat.title || '';
+            document.getElementById('cat-badge-input').value = cat.badge || '100% FREE';
+            document.getElementById('cat-tag-input').value = cat.tag || 'FREE';
+            document.getElementById('cat-icon-input').value = cat.icon || '📦';
+            document.getElementById('cat-order-input').value = cat.order ?? 1;
+            document.getElementById('cat-gradient-input').value = cat.gradient || 'from-[#00e5ff]/25 via-[#1e63f0]/35 to-[#0b2a6f]';
+            document.getElementById('cat-summary-input').value = cat.summary || '';
+        }
+
+        window.prepareNewCategoryForm = function() {
+            const nextOrder = getSortedCategories().length + 1;
+            document.getElementById('cat-mode').value = 'create';
+            document.getElementById('cat-original-key').value = '';
+            document.getElementById('cat-form-heading').textContent = '+ Create New Category';
+            document.getElementById('cat-key-input').value = '';
+            document.getElementById('cat-title-input').value = '';
+            document.getElementById('cat-badge-input').value = '100% FREE';
+            document.getElementById('cat-tag-input').value = 'NEW';
+            document.getElementById('cat-icon-input').value = '✨';
+            document.getElementById('cat-order-input').value = nextOrder;
+            document.getElementById('cat-gradient-input').value = 'from-[#00e5ff]/25 via-[#1e63f0]/35 to-[#0b2a6f]';
+            document.getElementById('cat-summary-input').value = '';
+            document.getElementById('cat-key-input').focus();
+        };
+
+        window.saveCategoryDetails = async function() {
+            const mode = document.getElementById('cat-mode').value;
+            const origKey = document.getElementById('cat-original-key').value;
+            const rawKey = (document.getElementById('cat-key-input').value || '').trim().toLowerCase().replace(/[^a-z0-9-_]+/g, '-');
+            const title = (document.getElementById('cat-title-input').value || '').trim();
+
+            if (!rawKey || !title) {
+                showAdminToast('Category Key and Title are required.', 'error');
+                return;
+            }
+
+            const existingItems = mode === 'edit' && catalogState[origKey]
+                ? (catalogState[origKey].items || [])
+                : (catalogState[rawKey]?.items || []);
+
+            const updatedCat = {
+                key: rawKey,
+                title,
+                badge: (document.getElementById('cat-badge-input').value || '100% FREE').trim(),
+                tag: (document.getElementById('cat-tag-input').value || 'FREE').trim(),
+                icon: (document.getElementById('cat-icon-input').value || '📦').trim(),
+                order: Number(document.getElementById('cat-order-input').value) || 1,
+                gradient: (document.getElementById('cat-gradient-input').value || 'from-[#00e5ff]/25 via-[#1e63f0]/35 to-[#0b2a6f]').trim(),
+                summary: (document.getElementById('cat-summary-input').value || '').trim(),
+                items: existingItems
+            };
+
+            if (mode === 'edit' && origKey && origKey !== rawKey) {
+                delete catalogState[origKey];
+            }
+
+            catalogState[rawKey] = updatedCat;
+            selectedCategoryKey = rawKey;
+            renderCategoryPills();
+            loadCategoryIntoForm(rawKey);
+            renderCategoryItems();
+            await persistCatalogToFirebase();
+        };
+
+        window.deleteSelectedCategory = async function() {
+            const sorted = getSortedCategories();
+            if (sorted.length <= 1) {
+                showAdminToast('Keep at least one category in the catalog.', 'error');
+                return;
+            }
+            if (!catalogState[selectedCategoryKey]) return;
+            delete catalogState[selectedCategoryKey];
+            const remaining = getSortedCategories();
+            selectedCategoryKey = remaining[0].key;
+            renderCategoryPills();
+            loadCategoryIntoForm(selectedCategoryKey);
+            resetItemForm();
+            renderCategoryItems();
+            await persistCatalogToFirebase();
+        };
+
+        window.moveSelectedCategory = async function(delta) {
+            const sorted = getSortedCategories();
+            const idx = sorted.findIndex(c => c.key === selectedCategoryKey);
+            const targetIdx = idx + delta;
+            if (idx === -1 || targetIdx < 0 || targetIdx >= sorted.length) return;
+
+            const temp = sorted[idx];
+            sorted[idx] = sorted[targetIdx];
+            sorted[targetIdx] = temp;
+
+            sorted.forEach((cat, i) => {
+                catalogState[cat.key].order = i + 1;
+            });
+
+            renderCategoryPills();
+            loadCategoryIntoForm(selectedCategoryKey);
+            await persistCatalogToFirebase();
+        };
+
+        window.addToolLinkRow = function(linkObj = { label: '', url: '', note: '' }) {
+            const container = document.getElementById('tool-links-rows');
+            const row = document.createElement('div');
+            row.className = 'tool-link-row grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-[#091432] p-2 rounded-xl border border-slate-800';
+            row.innerHTML = `
+                <input type="text" placeholder="Label" value="${escapeAttr(linkObj.label || '')}" class="tl-label sm:col-span-3 px-2.5 py-1.5 rounded-lg bg-[#050b1a] border border-slate-700 text-xs text-white">
+                <input type="text" placeholder="https://..." value="${escapeAttr(linkObj.url || '')}" class="tl-url sm:col-span-4 px-2.5 py-1.5 rounded-lg bg-[#050b1a] border border-slate-700 text-xs font-mono text-cyan-200">
+                <input type="text" placeholder="Note" value="${escapeAttr(linkObj.note || '')}" class="tl-note sm:col-span-3 px-2.5 py-1.5 rounded-lg bg-[#050b1a] border border-slate-700 text-xs text-slate-300">
+                <button type="button" onclick="this.parentElement.remove()" class="sm:col-span-2 py-1.5 rounded-lg bg-rose-500/15 text-rose-300 text-xs font-mono cursor-pointer">Remove</button>
+            `;
+            container.appendChild(row);
+        };
+
+        function collectToolLinksFromRows() {
+            const rows = Array.from(document.querySelectorAll('#tool-links-rows .tool-link-row'));
+            return rows
+                .map(r => ({
+                    label: (r.querySelector('.tl-label')?.value || '').trim(),
+                    url: (r.querySelector('.tl-url')?.value || '').trim(),
+                    note: (r.querySelector('.tl-note')?.value || '').trim()
+                }))
+                .filter(item => item.label || item.url);
+        }
+
+        function setToolLinksRows(links = []) {
+            const container = document.getElementById('tool-links-rows');
+            container.innerHTML = '';
+            if (!links.length) {
+                addToolLinkRow({ label: '', url: '', note: '' });
+            } else {
+                links.forEach(l => addToolLinkRow(l));
+            }
+        }
+
+        function formatFileSize(bytes) {
+            const num = Number(bytes) || 0;
+            if (num <= 0) return '0 B';
+            if (num < 1024) return `${num} B`;
+            if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)} KB`;
+            return `${(num / (1024 * 1024)).toFixed(2)} MB`;
+        }
+
+        function isTextOrCodeFile(file) {
+            const mime = (file.type || '').toLowerCase();
+            const name = (file.name || '').toLowerCase();
+            if (mime.startsWith('text/') || mime.includes('json') || mime.includes('javascript') || mime.includes('xml') || mime.includes('svg')) {
+                return true;
+            }
+            return /\.(html?|txt|js|mjs|cjs|css|json|xml|svg|md|py|php|sh|yml|yaml|csv|ts|tsx|jsx)$/i.test(name);
+        }
+
+        function renderUploadedFileStatus() {
+            const statusEl = document.getElementById('item-file-status-text');
+            const badgeEl = document.getElementById('item-file-size-badge');
+            if (!statusEl || !badgeEl) return;
+
+            if (currentUploadedFileAttachment && currentUploadedFileAttachment.name) {
+                const { name, type, size } = currentUploadedFileAttachment;
+                statusEl.innerHTML = `<span class="text-emerald-300 font-bold">Attached:</span> <span class="text-white">${escapeAttr(name)}</span> <span class="text-slate-400">(${escapeAttr(type || 'file')})</span>`;
+                badgeEl.textContent = formatFileSize(size);
+            } else {
+                statusEl.textContent = 'No file attached yet.';
+                badgeEl.textContent = '0 B';
+            }
+        }
+
+        window.clearUploadedItemFile = function() {
+            currentUploadedFileAttachment = null;
+            const inputEl = document.getElementById('item-file-upload-input');
+            if (inputEl) inputEl.value = '';
+            renderUploadedFileStatus();
+            showAdminToast('Removed attached file.', 'success');
+        };
+
+        window.handleItemThumbnailUpload = function(event) {
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+            if (file.size > MAX_LOGO_FILE_BYTES) {
+                showAdminToast('Thumbnail image exceeds 1.5 MB limit.', 'error');
+                event.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (typeof reader.result === 'string') {
+                    document.getElementById('item-thumb-input').value = reader.result;
+                    showAdminToast(`Loaded thumbnail "${file.name}"!`, 'success');
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.handleItemFileUpload = function(event) {
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+
+            if (file.size > MAX_INLINE_FILE_BYTES) {
+                showAdminToast('File exceeds 2 MB limit. Upload to Catbox/GitHub and paste URL.', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const titleInput = document.getElementById('item-title-input');
+            if (titleInput && !titleInput.value.trim()) {
+                titleInput.value = file.name.replace(/\.[^/.]+$/, '');
+            }
+
+            const dataReader = new FileReader();
+            dataReader.onload = () => {
+                currentUploadedFileAttachment = {
+                    name: file.name,
+                    type: file.type || 'application/octet-stream',
+                    size: file.size,
+                    dataUrl: typeof dataReader.result === 'string' ? dataReader.result : ''
+                };
+                renderUploadedFileStatus();
+
+                if (isTextOrCodeFile(file)) {
+                    const textReader = new FileReader();
+                    textReader.onload = () => {
+                        if (typeof textReader.result === 'string') {
+                            document.getElementById('item-startercode-input').value = textReader.result;
+                        }
+                        showAdminToast(`Loaded "${file.name}" into code & attached file!`, 'success');
+                    };
+                    textReader.readAsText(file);
+                } else {
+                    showAdminToast(`Attached "${file.name}" (${formatFileSize(file.size)})!`, 'success');
+                }
+            };
+            dataReader.onerror = () => {
+                showAdminToast('Could not read selected file.', 'error');
+            };
+            dataReader.readAsDataURL(file);
+        };
+
+        window.resetItemForm = function() {
+            document.getElementById('edit-item-id').value = '';
+            document.getElementById('item-form-heading').textContent = `Add New Item to ${catalogState[selectedCategoryKey]?.title || selectedCategoryKey}`;
+            document.getElementById('btn-cancel-item-edit').classList.add('hidden');
+            document.getElementById('item-title-input').value = '';
+            document.getElementById('item-version-input').value = 'Version 1.0';
+            document.getElementById('item-tag-input').value = 'FREE';
+            document.getElementById('item-subtitle-input').value = '';
+            document.getElementById('item-chips-input').value = '';
+            document.getElementById('item-lockpass-input').value = '';
+            document.getElementById('item-desc-input').value = '';
+            document.getElementById('item-locked-input').checked = false;
+            document.getElementById('item-visible-input').checked = true;
+            document.getElementById('item-featured-input').checked = false;
+            document.getElementById('item-isbot-input').checked = selectedCategoryKey === 'bot-making';
+            document.getElementById('item-isapi-input').checked = selectedCategoryKey === 'api-keys';
+            document.getElementById('item-isreview-input').checked = selectedCategoryKey === 'reviews';
+            document.getElementById('item-keyhint-input').value = '';
+            document.getElementById('item-download-input').value = '';
+            document.getElementById('item-video-input').value = '';
+            document.getElementById('item-thumb-input').value = '';
+            const thumbFileInput = document.getElementById('item-thumb-file-input');
+            if (thumbFileInput) thumbFileInput.value = '';
+            document.getElementById('item-buildcmd-input').value = '';
+            document.getElementById('item-startcmd-input').value = '';
+            document.getElementById('item-ffx-input').value = '';
+            document.getElementById('item-uidapi-input').value = '';
+            document.getElementById('item-weatherapi-input').value = '';
+            document.getElementById('item-freehost-input').value = '';
+            document.getElementById('item-startercode-input').value = '';
+            const uploadInput = document.getElementById('item-file-upload-input');
+            if (uploadInput) uploadInput.value = '';
+            currentUploadedFileAttachment = null;
+            renderUploadedFileStatus();
+            setToolLinksRows([]);
+        };
+
+        window.saveVersionItem = async function() {
+            const cat = catalogState[selectedCategoryKey];
+            if (!cat) return;
+            cat.items = Array.isArray(cat.items) ? cat.items : [];
+
+            const title = (document.getElementById('item-title-input').value || '').trim();
+            if (!title) {
+                showAdminToast('Please enter an item title.', 'error');
+                return;
+            }
+
+            const editId = document.getElementById('edit-item-id').value;
+            const starterCodeVal = document.getElementById('item-startercode-input').value || '';
+            const isLocked = document.getElementById('item-locked-input').checked;
+            const lockPassVal = (document.getElementById('item-lockpass-input').value || '').trim();
+            const keyHintVal = (document.getElementById('item-keyhint-input').value || '').trim();
+
+            let finalAttachment = currentUploadedFileAttachment ? { ...currentUploadedFileAttachment } : null;
+            if (!finalAttachment && starterCodeVal.trim()) {
+                const safeBase = title.toLowerCase().replace(/[^a-z0-9-_]+/g, '_') || 'code_snippet';
+                const isHtml = /<!doctype html|<html|<body|<div|<h[1-6]/i.test(starterCodeVal);
+                const ext = isHtml ? 'html' : 'txt';
+                const mime = isHtml ? 'text/html;charset=utf-8' : 'text/plain;charset=utf-8';
+                finalAttachment = {
+                    name: `${safeBase}.${ext}`,
+                    type: mime,
+                    size: new Blob([starterCodeVal]).size,
+                    dataUrl: `data:${mime};base64,${btoa(unescape(encodeURIComponent(starterCodeVal)))}`
+                };
+            }
+
+            const payload = {
+                id: editId || `${selectedCategoryKey}_${Date.now()}`,
+                title,
+                version: (document.getElementById('item-version-input').value || 'Version 1.0').trim(),
+                tag: (document.getElementById('item-tag-input').value || (isLocked ? 'KEY' : 'FREE')).trim(),
+                subtitle: (document.getElementById('item-subtitle-input').value || '').trim(),
+                description: (document.getElementById('item-desc-input').value || '').trim(),
+                chips: (document.getElementById('item-chips-input').value || '').trim(),
+                locked: isLocked || Boolean(lockPassVal),
+                lockPass: lockPassVal || (isLocked ? (settingsState.unlockPassword || settingsState.defaultUnlockPassword || 'ALAMIN') : ''),
+                visible: document.getElementById('item-visible-input').checked,
+                featured: document.getElementById('item-featured-input').checked,
+                keyHint: keyHintVal || lockPassVal,
+                downloadUrl: (document.getElementById('item-download-input').value || '#').trim(),
+                videoUrl: (document.getElementById('item-video-input').value || '').trim(),
+                thumbnailUrl: (document.getElementById('item-thumb-input').value || '').trim(),
+                renderBuildCmd: (document.getElementById('item-buildcmd-input').value || '').trim(),
+                renderStartCmd: (document.getElementById('item-startcmd-input').value || '').trim(),
+                uidCheckerApi: (document.getElementById('item-uidapi-input').value || '').trim(),
+                weatherApi: (document.getElementById('item-weatherapi-input').value || '').trim(),
+                ffxServerUrl: (document.getElementById('item-ffx-input').value || '').trim(),
+                freeHostingUrl: (document.getElementById('item-freehost-input').value || '').trim(),
+                isBot: document.getElementById('item-isbot-input').checked,
+                isApiKey: document.getElementById('item-isapi-input').checked,
+                isReview: document.getElementById('item-isreview-input').checked,
+                starterCode: starterCodeVal,
+                fileAttachment: finalAttachment,
+                toolLinks: collectToolLinksFromRows()
+            };
+
+            const existingIdx = cat.items.findIndex(x => x.id === payload.id);
+            if (existingIdx !== -1) {
+                cat.items[existingIdx] = payload;
+            } else {
+                cat.items.push(payload);
+            }
+
+            renderCategoryPills();
+            renderCategoryItems();
+            resetItemForm();
+            await persistCatalogToFirebase();
+        };
+
+        window.editVersionItem = function(itemId) {
+            const cat = catalogState[selectedCategoryKey];
+            const item = (cat?.items || []).find(x => x.id === itemId);
+            if (!item) return;
+
+            document.getElementById('edit-item-id').value = item.id;
+            document.getElementById('item-form-heading').textContent = `Edit Item: ${item.title}`;
+            document.getElementById('btn-cancel-item-edit').classList.remove('hidden');
+
+            document.getElementById('item-title-input').value = item.title || '';
+            document.getElementById('item-version-input').value = item.version || '';
+            document.getElementById('item-tag-input').value = item.tag || '';
+            document.getElementById('item-subtitle-input').value = item.subtitle || '';
+            document.getElementById('item-chips-input').value = item.chips || '';
+            document.getElementById('item-lockpass-input').value = item.lockPass || '';
+            document.getElementById('item-desc-input').value = item.description || '';
+            document.getElementById('item-locked-input').checked = Boolean(item.locked) || Boolean(item.lockPass);
+            document.getElementById('item-visible-input').checked = item.visible === undefined ? true : Boolean(item.visible);
+            document.getElementById('item-featured-input').checked = Boolean(item.featured);
+            document.getElementById('item-isbot-input').checked = Boolean(item.isBot);
+            document.getElementById('item-isapi-input').checked = Boolean(item.isApiKey);
+            document.getElementById('item-isreview-input').checked = Boolean(item.isReview);
+            document.getElementById('item-keyhint-input').value = item.keyHint || '';
+            document.getElementById('item-download-input').value = item.downloadUrl || '';
+            document.getElementById('item-video-input').value = item.videoUrl || '';
+            document.getElementById('item-thumb-input').value = item.thumbnailUrl || '';
+            document.getElementById('item-buildcmd-input').value = item.renderBuildCmd || '';
+            document.getElementById('item-startcmd-input').value = item.renderStartCmd || '';
+            document.getElementById('item-ffx-input').value = item.ffxServerUrl || '';
+            document.getElementById('item-uidapi-input').value = item.uidCheckerApi || '';
+            document.getElementById('item-weatherapi-input').value = item.weatherApi || '';
+            document.getElementById('item-freehost-input').value = item.freeHostingUrl || '';
+            document.getElementById('item-startercode-input').value = item.starterCode || '';
+            currentUploadedFileAttachment = item.fileAttachment ? { ...item.fileAttachment } : null;
+            const uploadInput = document.getElementById('item-file-upload-input');
+            if (uploadInput) uploadInput.value = '';
+            renderUploadedFileStatus();
+            setToolLinksRows(item.toolLinks || []);
+            document.getElementById('item-title-input').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        window.moveVersionItem = async function(idx, delta) {
+            const cat = catalogState[selectedCategoryKey];
+            if (!cat || !Array.isArray(cat.items)) return;
+            const target = idx + delta;
+            if (idx < 0 || target < 0 || target >= cat.items.length) return;
+
+            const temp = cat.items[idx];
+            cat.items[idx] = cat.items[target];
+            cat.items[target] = temp;
+
+            renderCategoryItems();
+            await persistCatalogToFirebase();
+        };
+
+        window.deleteVersionItem = async function(itemId) {
+            const cat = catalogState[selectedCategoryKey];
+            if (!cat || !Array.isArray(cat.items)) return;
+            cat.items = cat.items.filter(x => x.id !== itemId);
+            renderCategoryPills();
+            renderCategoryItems();
+            await persistCatalogToFirebase();
+        };
+
+        function renderCategoryItems() {
+            const cat = catalogState[selectedCategoryKey];
+            const items = (cat && Array.isArray(cat.items)) ? cat.items : [];
+            document.getElementById('items-list-heading').textContent = `Items in ${cat?.title || selectedCategoryKey}`;
+            document.getElementById('items-list-count').textContent = `${items.length} ${items.length === 1 ? 'item' : 'items'}`;
+
+            const container = document.getElementById('category-items-container');
+            if (!items.length) {
+                container.innerHTML = `<div class="rounded-2xl bg-[#050b1a]/80 border border-slate-800 p-5 text-center text-xs text-slate-400">No items in this category yet. Use the form above to add one.</div>`;
+                return;
+            }
+
+            container.innerHTML = items.map((item, idx) => `
+                <div class="rounded-2xl bg-[#091432]/90 border border-[#4fa3ff]/25 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="min-w-0 space-y-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2 py-0.5 rounded bg-[#00e5ff]/15 text-[#00e5ff] font-mono text-[11px] font-bold">${item.version || 'V1.0'}</span>
+                            <span class="font-bold text-sm text-white truncate">${item.title}</span>
+                            ${item.tag ? `<span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-200 font-mono text-[10px]">${escapeAttr(item.tag)}</span>` : ''}
+                            ${item.featured ? `<span class="px-2 py-0.5 rounded-full bg-cyan-400/20 text-[#00e5ff] font-mono text-[10px]">★ FEATURED</span>` : ''}
+                            ${item.visible === false ? `<span class="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 font-mono text-[10px]">HIDDEN</span>` : ''}
+                            ${item.fileAttachment && item.fileAttachment.name ? `<span class="px-2 py-0.5 rounded-full bg-cyan-500/15 text-[#00e5ff] border border-[#00e5ff]/30 font-mono text-[10px]">📎 ${escapeAttr(item.fileAttachment.name)} (${formatFileSize(item.fileAttachment.size)})</span>` : ''}
+                            ${item.locked || item.lockPass ? `<span class="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono text-[10px]">🔒 LOCKED</span>` : `<span class="px-2 py-0.5 rounded-full bg-emerald-400/15 text-emerald-300 font-mono text-[10px]">OPEN</span>`}
+                        </div>
+                        <p class="text-xs text-slate-300 line-clamp-1">${item.subtitle || item.description || ''}</p>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="moveVersionItem(${idx}, -1)" title="Move Up" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-mono text-[#00e5ff] cursor-pointer">↑</button>
+                        <button type="button" onclick="moveVersionItem(${idx}, 1)" title="Move Down" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-mono text-[#00e5ff] cursor-pointer">↓</button>
+                        <button type="button" onclick="editVersionItem('${item.id}')" class="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-xs font-mono font-bold text-sky-300 cursor-pointer">Edit</button>
+                        <button type="button" onclick="deleteVersionItem('${item.id}')" class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-xs font-mono font-bold text-rose-300 cursor-pointer">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getActiveLogoSourceFromState() {
+            return (settingsState.logoData || settingsState.logoUrl || '').trim();
+        }
+
+        function updateLogoPreviewUI(rawLogoVal) {
+            const val = (rawLogoVal || '').trim();
+            const imgEl = document.getElementById('set-logo-preview-img');
+            const fallbackEl = document.getElementById('set-logo-preview-fallback');
+            const metaEl = document.getElementById('set-logo-meta-text');
+            const sizeEl = document.getElementById('set-logo-size-text');
+            if (!imgEl || !fallbackEl || !metaEl || !sizeEl) return;
+
+            if (!val) {
+                imgEl.src = '';
+                imgEl.classList.add('hidden');
+                fallbackEl.classList.remove('hidden');
+                metaEl.textContent = 'Using default DA monogram logo';
+                sizeEl.textContent = '0 B';
+                return;
+            }
+
+            imgEl.src = val;
+            imgEl.classList.remove('hidden');
+            fallbackEl.classList.add('hidden');
+            imgEl.onerror = () => {
+                imgEl.classList.add('hidden');
+                fallbackEl.classList.remove('hidden');
+                metaEl.textContent = 'Unable to render image preview — verify URL/data';
+            };
+
+            const computedBytes = currentLogoMeta.size > 0
+                ? currentLogoMeta.size
+                : new Blob([val]).size;
+            sizeEl.textContent = formatFileSize(computedBytes);
+
+            if (currentLogoMeta.name) {
+                metaEl.textContent = `${currentLogoMeta.name} (${currentLogoMeta.type || 'image'})`;
+            } else if (val.startsWith('data:image/')) {
+                const mimeMatch = val.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
+                metaEl.textContent = `Embedded Data URL (${mimeMatch ? mimeMatch[1] : 'image'})`;
+            } else {
+                metaEl.textContent = 'Custom External Logo URL';
+            }
+        }
+
+        window.syncLogoPreviewFromInput = function() {
+            const input = document.getElementById('set-logoUrl');
+            const val = (input?.value || '').trim();
+            if (!val.startsWith('data:')) {
+                currentLogoMeta = { name: '', type: '', size: 0 };
+            }
+            updateLogoPreviewUI(val);
+        };
+
+        window.handleUserLogoUpload = function(event) {
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+
+            const validMime = /^image\/(png|jpeg|jpg|webp|svg\+xml|gif)$/i.test(file.type || '');
+            const validExt = /\.(png|jpe?g|webp|svg|gif)$/i.test(file.name || '');
+            if (!validMime && !validExt) {
+                showAdminToast('Please select a PNG, JPG, WEBP, SVG, or GIF image.', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            if (file.size > MAX_LOGO_FILE_BYTES) {
+                showAdminToast('Logo file exceeds 1.5 MB limit. Choose a smaller image.', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (typeof reader.result !== 'string') {
+                    showAdminToast('Failed to read image file.', 'error');
+                    return;
+                }
+                currentLogoMeta = {
+                    name: file.name,
+                    type: file.type || 'image/*',
+                    size: file.size
+                };
+                const logoInput = document.getElementById('set-logoUrl');
+                logoInput.value = reader.result;
+                updateLogoPreviewUI(reader.result);
+                showAdminToast(`Loaded logo "${file.name}" (${formatFileSize(file.size)})!`, 'success');
+            };
+            reader.onerror = () => {
+                showAdminToast('Error reading selected logo file.', 'error');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.clearUserPanelLogo = async function() {
+            currentLogoMeta = { name: '', type: '', size: 0 };
+            const fileInput = document.getElementById('set-logo-file-input');
+            if (fileInput) fileInput.value = '';
+            const logoInput = document.getElementById('set-logoUrl');
+            if (logoInput) logoInput.value = '';
+            settingsState.logoUrl = '';
+            settingsState.logoData = '';
+            updateLogoPreviewUI('');
+            await persistSettingsToFirebase();
+            showAdminToast('Reset user panel logo to default.', 'success');
+        };
+
+        function populateSettingsForm() {
+            const descValue = settingsState.heroDesc || settingsState.subtitle || '';
+            const unlockPassVal = settingsState.defaultUnlockPassword || settingsState.unlockPassword || 'ALAMIN';
+            const logoVal = getActiveLogoSourceFromState();
+
+            document.getElementById('set-brandName').value = settingsState.brandName || '';
+            document.getElementById('set-roleTag').value = settingsState.roleTag || '';
+            document.getElementById('set-heroDesc').value = descValue;
+            document.getElementById('set-telegramUrl').value = settingsState.telegramUrl || '';
+            document.getElementById('set-youtubeUrl').value = settingsState.youtubeUrl || '';
+            document.getElementById('set-tiktokUrl').value = settingsState.tiktokUrl || '';
+            document.getElementById('set-facebookUrl').value = settingsState.facebookUrl || '';
+            document.getElementById('set-whatsappUrl').value = settingsState.whatsappUrl || '';
+            document.getElementById('set-githubUrl').value = settingsState.githubUrl || '';
+            document.getElementById('set-instagramUrl').value = settingsState.instagramUrl || '';
+            document.getElementById('set-supportEmail').value = settingsState.supportEmail || '';
+            document.getElementById('set-footerText').value = settingsState.footerText || '';
+            document.getElementById('set-logoUrl').value = logoVal;
+            document.getElementById('set-heroAvatarUrl').value = settingsState.heroAvatarUrl || '';
+            document.getElementById('set-videoPreviewUrl').value = settingsState.videoPreviewUrl || '';
+            document.getElementById('set-defaultUnlockPassword').value = unlockPassVal;
+            document.getElementById('set-adminPassword').value = settingsState.adminPassword || 'ALAMIN';
+            document.getElementById('set-videoPreviewTitle').value = settingsState.videoPreviewTitle || '';
+            document.getElementById('set-announcementBanner').value = settingsState.announcementBanner || '';
+            document.getElementById('set-codeName').value = settingsState.codeName || '';
+
+            document.getElementById('set-showCommunityPopup').checked = settingsState.showCommunityPopup === undefined ? true : Boolean(settingsState.showCommunityPopup);
+            document.getElementById('set-showBanner').checked = settingsState.showBanner === undefined ? true : Boolean(settingsState.showBanner);
+            document.getElementById('set-enableCodeToFile').checked = settingsState.enableCodeToFile === undefined ? true : Boolean(settingsState.enableCodeToFile);
+            document.getElementById('set-enableOrders').checked = settingsState.enableOrders === undefined ? true : Boolean(settingsState.enableOrders);
+            document.getElementById('set-showSearchBar').checked = settingsState.showSearchBar === undefined ? true : Boolean(settingsState.showSearchBar);
+            document.getElementById('set-maintenanceMode').checked = Boolean(settingsState.maintenanceMode);
+
+            updateLogoPreviewUI(logoVal);
+        }
+
+        window.saveSiteSettings = async function() {
+            const rawAdminPass = (document.getElementById('set-adminPassword').value || '').trim();
+            const finalAdminPass = rawAdminPass || (settingsState.adminPassword || '').trim() || 'ALAMIN';
+            const rawUnlockPass = (document.getElementById('set-defaultUnlockPassword').value || '').trim() || 'ALAMIN';
+            const descText = (document.getElementById('set-heroDesc').value || '').trim();
+            const logoInputVal = (document.getElementById('set-logoUrl').value || '').trim();
+
+            settingsState = {
+                brandName: (document.getElementById('set-brandName').value || 'DEV AL AMIN').trim(),
+                roleTag: (document.getElementById('set-roleTag').value || '').trim(),
+                heroDesc: descText,
+                subtitle: descText,
+                telegramUrl: (document.getElementById('set-telegramUrl').value || '').trim(),
+                youtubeUrl: (document.getElementById('set-youtubeUrl').value || '').trim(),
+                tiktokUrl: (document.getElementById('set-tiktokUrl').value || '').trim(),
+                facebookUrl: (document.getElementById('set-facebookUrl').value || '').trim(),
+                whatsappUrl: (document.getElementById('set-whatsappUrl').value || '').trim(),
+                githubUrl: (document.getElementById('set-githubUrl').value || '').trim(),
+                instagramUrl: (document.getElementById('set-instagramUrl').value || '').trim(),
+                supportEmail: (document.getElementById('set-supportEmail').value || '').trim(),
+                footerText: (document.getElementById('set-footerText').value || '').trim(),
+                logoUrl: logoInputVal,
+                logoData: logoInputVal,
+                heroAvatarUrl: (document.getElementById('set-heroAvatarUrl').value || '').trim(),
+                videoPreviewUrl: (document.getElementById('set-videoPreviewUrl').value || '').trim(),
+                defaultUnlockPassword: rawUnlockPass,
+                unlockPassword: rawUnlockPass,
+                adminPassword: finalAdminPass,
+                videoPreviewTitle: (document.getElementById('set-videoPreviewTitle').value || '').trim(),
+                announcementBanner: (document.getElementById('set-announcementBanner').value || '').trim(),
+                codeName: (document.getElementById('set-codeName').value || '').trim(),
+                showCommunityPopup: document.getElementById('set-showCommunityPopup').checked,
+                showBanner: document.getElementById('set-showBanner').checked,
+                enableCodeToFile: document.getElementById('set-enableCodeToFile').checked,
+                enableOrders: document.getElementById('set-enableOrders').checked,
+                showSearchBar: document.getElementById('set-showSearchBar').checked,
+                maintenanceMode: document.getElementById('set-maintenanceMode').checked
+            };
+            document.getElementById('set-adminPassword').value = finalAdminPass;
+            await persistSettingsToFirebase();
+        };
+
+        // Orders Management
+        window.setOrderStatusFilter = function(status) {
+            orderStatusFilter = status;
+            ['all', 'Pending', 'Approved', 'Completed', 'Cancelled'].forEach(st => {
+                const btn = document.getElementById(`order-filter-${st}`);
+                if (!btn) return;
+                if (st === status) {
+                    btn.className = 'px-3 py-1.5 rounded-xl bg-[#00e5ff] text-[#050b1a] font-bold cursor-pointer';
+                } else {
+                    const colorMap = {
+                        all: 'text-slate-300',
+                        Pending: 'text-amber-300',
+                        Approved: 'text-sky-300',
+                        Completed: 'text-emerald-300',
+                        Cancelled: 'text-rose-300'
+                    };
+                    btn.className = `px-3 py-1.5 rounded-xl bg-slate-800 ${colorMap[st] || 'text-slate-300'} cursor-pointer`;
+                }
+            });
+            renderOrdersList();
+        };
+
+        window.addSampleOrderRecord = async function() {
+            const id = `ord_${Date.now().toString().slice(-6)}`;
+            ordersState[id] = {
+                id,
+                customerName: 'New Client',
+                contact: '@dev_client',
+                itemTitle: 'CODE TO FILE MAKE / Web Pack',
+                amount: 'FREE',
+                status: 'Pending',
+                note: 'Added from Admin Panel',
+                createdAt: new Date().toISOString()
+            };
+            renderOrdersList();
+            await persistOrdersToFirebase();
+        };
+
+        window.updateOrderStatus = async function(orderId, newStatus) {
+            if (!ordersState[orderId]) return;
+            ordersState[orderId].status = newStatus;
+            renderOrdersList();
+            await persistOrdersToFirebase();
+        };
+
+        window.updateOrderNote = async function(orderId, noteVal) {
+            if (!ordersState[orderId]) return;
+            ordersState[orderId].note = noteVal;
+            saveLocalBackup();
+            refreshJsonInspector();
+            if (db && isFbConnected) {
+                try {
+                    await set(ref(db, `devAlAmin/orders/${orderId}/note`), noteVal);
+                } catch (_) {}
+            }
+        };
+
+        window.deleteOrderRecord = async function(orderId) {
+            if (!ordersState[orderId]) return;
+            delete ordersState[orderId];
+            renderOrdersList();
+            updateSummaryCounts();
+            saveLocalBackup();
+            refreshJsonInspector();
+            if (db && isFbConnected) {
+                try {
+                    await remove(ref(db, `devAlAmin/orders/${orderId}`));
+                    showAdminToast('Removed order from Firebase!', 'success');
+                } catch (_) {
+                    showAdminToast('Removed order locally.', 'success');
+                }
+            } else {
+                showAdminToast('Removed order locally.', 'success');
+            }
+        };
+
+        window.exportOrdersJson = function() {
+            const blob = new Blob([JSON.stringify({ orders: ordersState }, null, 2)], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dev-al-amin-orders.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showAdminToast('Exported orders JSON!', 'success');
+        };
+
+        function renderOrdersList() {
+            const container = document.getElementById('orders-list-container');
+            if (!container) return;
+
+            const list = Object.values(ordersState || {}).filter(o => {
+                if (orderStatusFilter === 'all') return true;
+                return o.status === orderStatusFilter;
+            });
+
+            if (!list.length) {
+                container.innerHTML = `<div class="rounded-2xl bg-[#050b1a] border border-slate-800 p-6 text-center text-xs text-slate-400">No orders found for "${orderStatusFilter}".</div>`;
+                return;
+            }
+
+            const statusBadgeMap = {
+                Pending: 'bg-amber-400/20 text-amber-300 border-amber-400/40',
+                Approved: 'bg-sky-400/20 text-sky-300 border-sky-400/40',
+                Completed: 'bg-emerald-400/20 text-emerald-300 border-emerald-400/40',
+                Cancelled: 'bg-rose-400/20 text-rose-300 border-rose-400/40'
+            };
+
+            container.innerHTML = list.map(ord => `
+                <div class="rounded-2xl bg-[#091432] border border-[#4fa3ff]/25 p-4 space-y-2.5 text-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-mono font-bold text-[#00e5ff]">#${escapeAttr(ord.id)}</span>
+                            <span class="font-bold text-sm text-white">${escapeAttr(ord.customerName)}</span>
+                            <span class="font-mono text-slate-400">${escapeAttr(ord.contact || '')}</span>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold border ${statusBadgeMap[ord.status] || statusBadgeMap.Pending}">${escapeAttr(ord.status)}</span>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2 text-slate-300">
+                        <span>Item: <strong class="text-white">${escapeAttr(ord.itemTitle)}</strong></span>
+                        <span class="font-mono text-emerald-300 font-bold">${escapeAttr(ord.amount)}</span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1">
+                        <input type="text" value="${escapeAttr(ord.note || '')}" placeholder="Admin note..."
+                               onchange="updateOrderNote('${escapeAttr(ord.id)}', this.value)"
+                               class="flex-1 px-3 py-1.5 rounded-xl bg-[#050b1a] border border-slate-700 text-xs text-slate-200">
+                        <div class="flex items-center gap-1.5">
+                            <select onchange="updateOrderStatus('${escapeAttr(ord.id)}', this.value)"
+                                    class="px-2.5 py-1.5 rounded-xl bg-[#050b1a] border border-slate-700 font-mono text-xs text-[#00e5ff] cursor-pointer">
+                                ${['Pending', 'Approved', 'Completed', 'Cancelled'].map(st => `<option value="${st}" ${ord.status === st ? 'selected' : ''}>${st}</option>`).join('')}
+                            </select>
+                            <button type="button" onclick="deleteOrderRecord('${escapeAttr(ord.id)}')" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 font-mono text-xs cursor-pointer">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Seed / Export / Import / Reset
+        window.seedStarterData = async function() {
+            const keepAdminPass = getActiveSavedAdminPassword();
+            catalogState = buildStarterCatalog();
+            settingsState = { ...buildDefaultSettings(), adminPassword: keepAdminPass };
+            ordersState = buildStarterOrders();
+            selectedCategoryKey = 'free-website';
+            refreshDashboardViews();
+            await persistCatalogToFirebase();
+            await persistSettingsToFirebase();
+            await persistOrdersToFirebase();
+            showAdminToast('Seeded starter catalog, settings & orders!', 'success');
+        };
+
+        window.exportFullJson = function() {
+            const bundle = JSON.stringify({
+                devAlAmin: {
+                    catalog: catalogState,
+                    settings: settingsState,
+                    orders: ordersState
+                }
+            }, null, 2);
+
+            const blob = new Blob([bundle], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dev-al-amin-rtdb-export.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showAdminToast('Exported dev-al-amin-rtdb-export.json!', 'success');
+        };
+
+        window.openImportJsonModal = function() {
+            document.getElementById('import-json-input').value = '';
+            document.getElementById('import-json-modal').classList.replace('hidden', 'flex');
+        };
+
+        window.closeImportJsonModal = function() {
+            document.getElementById('import-json-modal').classList.replace('flex', 'hidden');
+        };
+
+        window.confirmImportJson = async function() {
+            const raw = document.getElementById('import-json-input').value;
+            await applyImportedJsonText(raw);
+            closeImportJsonModal();
+        };
+
+        async function applyImportedJsonText(raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                const root = parsed.devAlAmin && typeof parsed.devAlAmin === 'object' ? parsed.devAlAmin : parsed;
+
+                if (root.catalog && typeof root.catalog === 'object') {
+                    catalogState = normalizeCatalog(root.catalog);
+                    await persistCatalogToFirebase();
+                }
+                if (root.settings && typeof root.settings === 'object') {
+                    settingsState = { ...buildDefaultSettings(), ...root.settings };
+                    if (!settingsState.adminPassword || !String(settingsState.adminPassword).trim()) {
+                        settingsState.adminPassword = 'ALAMIN';
+                    }
+                    await persistSettingsToFirebase();
+                }
+                if (root.orders && typeof root.orders === 'object') {
+                    ordersState = normalizeOrders(root.orders);
+                    await persistOrdersToFirebase();
+                }
+
+                selectedCategoryKey = getSortedCategories()[0]?.key || 'free-website';
+                refreshDashboardViews();
+                showAdminToast('JSON imported and applied!', 'success');
+            } catch (_) {
+                showAdminToast('Invalid JSON format.', 'error');
+            }
+        }
+
+        window.resetAllAdminData = async function() {
+            const keepAdminPass = getActiveSavedAdminPassword();
+            localStorage.removeItem(LOCAL_BACKUP_KEY);
+            catalogState = buildStarterCatalog();
+            settingsState = { ...buildDefaultSettings(), adminPassword: keepAdminPass };
+            ordersState = buildStarterOrders();
+            selectedCategoryKey = 'free-website';
+            refreshDashboardViews();
+            if (db && isFbConnected) {
+                try {
+                    await set(ref(db, 'devAlAmin/catalog'), catalogState);
+                    await set(ref(db, 'devAlAmin/settings'), settingsState);
+                    await set(ref(db, 'devAlAmin/orders'), ordersState);
+                } catch (_) {}
+            }
+            showAdminToast('Reset catalog, settings & orders to starter defaults.', 'success');
+        };
+
+        function refreshJsonInspector() {
+            const el = document.getElementById('json-inspector-area');
+            if (!el) return;
+            el.value = JSON.stringify({
+                catalog: catalogState,
+                settings: settingsState,
+                orders: ordersState
+            }, null, 2);
+        }
+
+        window.refreshJsonInspector = refreshJsonInspector;
+
+        window.copyJsonInspector = function() {
+            copyToClipboard(document.getElementById('json-inspector-area').value, 'Copied JSON!');
+        };
+
+        window.applyJsonInspector = async function() {
+            await applyImportedJsonText(document.getElementById('json-inspector-area').value);
+        };
+
+        function refreshDashboardViews() {
+            updateSummaryCounts();
+            renderCategoryPills();
+            loadCategoryIntoForm(selectedCategoryKey);
+            resetItemForm();
+            renderCategoryItems();
+            populateSettingsForm();
+            renderOrdersList();
+            refreshJsonInspector();
+        }
+
+        function escapeAttr(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function copyToClipboard(text, successMsg) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showAdminToast(successMsg || 'Copied!', 'success');
+        }
+
+        window.addEventListener('click', e => {
+            if (e.target.id === 'import-json-modal') closeImportJsonModal();
+        });
+
+        async function bootstrapAdmin() {
+            loadLocalBackup();
+            updateAdminAuthView(isSessionUnlocked());
+
+            if (isSessionUnlocked()) {
+                refreshDashboardViews();
+                switchAdminTab(activeAdminTab);
+            }
+
+            try {
+                const savedCfgRaw = localStorage.getItem(SHARED_FB_KEY);
+                if (savedCfgRaw) {
+                    const parsedCfg = JSON.parse(savedCfgRaw);
+                    fillConfigInputs(parsedCfg);
+                    document.getElementById('fb-paste-config').value = JSON.stringify(parsedCfg, null, 2);
+                    await initFirebaseClient(parsedCfg, false);
+                }
+            } catch (_) {
+                setFbBadge(false, 'LOCAL / OFFLINE');
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bootstrapAdmin);
+        } else {
+            bootstrapAdmin();
+        }
+    </script>
+</body>
+</html>
